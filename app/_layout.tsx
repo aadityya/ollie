@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
 import { useFonts } from 'expo-font';
 import {
@@ -17,8 +17,28 @@ import { useBabyStore } from '@/src/stores/useBabyStore';
 
 SplashScreen.preventAutoHideAsync();
 
+function useOnboardingRedirect() {
+  const router = useRouter();
+  const segments = useSegments();
+  const onboardingCompleted = useSettingsStore((s) => s.onboardingCompleted);
+  const isLoaded = useSettingsStore((s) => s.isLoaded);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const inOnboarding = segments[0] === 'onboarding';
+
+    if (!onboardingCompleted && !inOnboarding) {
+      router.replace('/onboarding');
+    } else if (onboardingCompleted && inOnboarding) {
+      router.replace('/');
+    }
+  }, [onboardingCompleted, isLoaded, segments]);
+}
+
 function AppContent() {
   const theme = useOlliePaperTheme();
+  useOnboardingRedirect();
 
   return (
     <PaperProvider theme={theme}>
