@@ -1,6 +1,6 @@
 import { getDatabase } from '../database';
 import { Baby } from '@/src/types';
-import { v4 as uuid } from 'uuid';
+import * as Crypto from 'expo-crypto';
 
 function rowToBaby(row: Record<string, unknown>): Baby {
   return {
@@ -36,7 +36,7 @@ export async function insertBaby(data: {
   gender?: string;
 }): Promise<Baby> {
   const db = await getDatabase();
-  const id = uuid();
+  const id = Crypto.randomUUID();
   const now = new Date().toISOString();
   await db.runAsync(
     `INSERT INTO babies (id, name, date_of_birth, gender, is_active, created_at, updated_at)

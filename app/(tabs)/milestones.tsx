@@ -4,6 +4,7 @@ import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { useAppTheme } from '@/src/theme';
+import { VersionBadge } from '@/src/components/VersionBadge';
 
 export default function MilestonesScreen() {
   const { ollie } = useAppTheme();
@@ -19,6 +20,7 @@ export default function MilestonesScreen() {
         <Text style={[styles.placeholder, { color: ollie.textLight }]}>
           Milestones coming in Phase 3
         </Text>
+        <VersionBadge />
       </ScrollView>
     </SafeAreaView>
   );

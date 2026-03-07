@@ -12,6 +12,7 @@ import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useTimelineStore } from '@/src/stores/useTimelineStore';
 import { getTimeOfDayGroup, getTimeOfDayLabel } from '@/src/utils/dateHelpers';
 import { Activity } from '@/src/types';
+import { VersionBadge } from '@/src/components/VersionBadge';
 
 function groupByTimeOfDay(activities: Activity[]): Record<string, Activity[]> {
   const groups: Record<string, Activity[]> = {};
@@ -80,6 +81,8 @@ export default function TimelineScreen() {
             </View>
           ))
         )}
+
+        <VersionBadge />
       </ScrollView>
     </SafeAreaView>
   );

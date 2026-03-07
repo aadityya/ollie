@@ -12,6 +12,7 @@ import { useTimer } from '@/src/hooks/useTimer';
 import { useActivityStore } from '@/src/stores/useActivityStore';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { activityMeta } from '@/src/utils/activityHelpers';
+import { VersionBadge } from '@/src/components/VersionBadge';
 import {
   ActivityType,
   FeedType,
@@ -285,6 +286,8 @@ export default function ActivityFormScreen() {
             {saving ? 'Saving...' : 'Save'}
           </Text>
         </Pressable>
+
+        <VersionBadge />
       </ScrollView>
     </SafeAreaView>
   );

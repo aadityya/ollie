@@ -8,6 +8,7 @@ import { SettingsItem } from '@/src/components/SettingsItem';
 import { ThemeSelector } from '@/src/components/ThemeSelector';
 import { useAppTheme } from '@/src/theme';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
+import { APP_VERSION } from '@/src/constants/version';
 
 export default function SettingsScreen() {
   const { ollie } = useAppTheme();
@@ -88,7 +89,7 @@ export default function SettingsScreen() {
         {/* App Info */}
         <View style={styles.appInfo}>
           <Text style={[styles.appName, { color: ollie.textPrimary }]}>Ollie</Text>
-          <Text style={[styles.appVersion, { color: ollie.textLight }]}>Version 1.0.0</Text>
+          <Text style={[styles.appVersion, { color: ollie.textLight }]}>Version {APP_VERSION}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

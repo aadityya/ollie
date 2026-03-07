@@ -8,6 +8,7 @@ import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { activityMeta } from '@/src/utils/activityHelpers';
 import { ActivityType } from '@/src/types';
+import { VersionBadge } from '@/src/components/VersionBadge';
 
 export default function LogScreen() {
   const { ollie } = useAppTheme();
@@ -54,6 +55,8 @@ export default function LogScreen() {
           onPress={() => router.push('/log/colic')}
           fullWidth
         />
+
+        <VersionBadge />
       </ScrollView>
     </SafeAreaView>
   );

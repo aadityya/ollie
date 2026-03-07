@@ -1,6 +1,6 @@
 import { getDatabase } from '../database';
 import { Activity, ActivityType } from '@/src/types';
-import { v4 as uuid } from 'uuid';
+import * as Crypto from 'expo-crypto';
 
 function rowToActivity(row: Record<string, unknown>): Activity {
   return {
@@ -83,7 +83,7 @@ export async function insertActivity(
   data: Omit<Activity, 'id' | 'createdAt'>
 ): Promise<Activity> {
   const db = await getDatabase();
-  const id = uuid();
+  const id = Crypto.randomUUID();
   const now = new Date().toISOString();
 
   await db.runAsync(

@@ -8,6 +8,7 @@ import { SummaryCard } from '@/src/components/SummaryCard';
 import { QuickActionButton } from '@/src/components/QuickActionButton';
 import { TimelineItem } from '@/src/components/TimelineItem';
 import { EmptyState } from '@/src/components/EmptyState';
+import { VersionBadge } from '@/src/components/VersionBadge';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useTodaySummary } from '@/src/hooks/useTodaySummary';
@@ -134,6 +135,8 @@ export default function HomeScreen() {
             subtitle="Tap Quick Log above to start tracking"
           />
         )}
+
+        <VersionBadge />
       </ScrollView>
     </SafeAreaView>
   );
