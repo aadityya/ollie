@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ollie — Baby Activity Tracker Mockups</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ========== RESET & PAGE ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* ========== THEME SELECTOR (outside phone) ========== */
+.theme-selector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.theme-btn {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 24px;
+  border: 3px solid transparent;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.theme-btn.active { transform: scale(1.05); }
+.theme-btn[data-theme="pastel"] { background: #FDDEDE; color: #8B5E6B; }
+.theme-btn[data-theme="pastel"].active { border-color: #E8A0B4; }
+.theme-btn[data-theme="earthy"] { background: #F5E6D3; color: #8B5E3C; }
+.theme-btn[data-theme="earthy"].active { border-color: #C4956A; }
+.theme-btn[data-theme="minimal"] { background: #F5F3F0; color: #6B6B6B; }
+.theme-btn[data-theme="minimal"].active { border-color: #AAAAAA; }
+
+/* ========== THEME: SOFT PASTELS ========== */
+[data-active-theme="pastel"] {
+  --bg: #FFF5F5;
+  --bg-card: #FFFFFF;
+  --bg-secondary: #FFF0F0;
+  --text-primary: #5C3D4A;
+  --text-secondary: #9B7A8A;
+  --text-light: #C4A0B0;
+  --accent: #F4A0B8;
+  --accent-light: #FDDEDE;
+  --accent2: #B8D4E3;
+  --accent3: #C5E8D5;
+  --accent4: #E8D5F5;
+  --accent5: #F5E6C5;
+  --feed-bg: #FDDEDE; --feed-color: #D4748B;
+  --pee-bg: #FFF3D6; --pee-color: #D4A84B;
+  --poop-bg: #E8D5C0; --poop-color: #A0785A;
+  --sleep-bg: #D5E0F5; --sleep-color: #6B82B8;
+  --colic-bg: #E8D5F5; --colic-color: #9B6BB8;
+  --nav-bg: #FFFFFF;
+  --nav-active: #F4A0B8;
+  --nav-inactive: #C4A0B0;
+  --shadow: rgba(244, 160, 184, 0.15);
+  --border: #FDDEDE;
+  --progress-bg: #FFF0F0;
+  --success: #8BC5A0;
+  --radius: 20px;
+  --radius-sm: 14px;
+}
+
+/* ========== THEME: EARTHY WARM ========== */
+[data-active-theme="earthy"] {
+  --bg: #FAF6F1;
+  --bg-card: #FFFFFF;
+  --bg-secondary: #F5EDE3;
+  --text-primary: #4A3728;
+  --text-secondary: #8B7560;
+  --text-light: #B8A692;
+  --accent: #C4956A;
+  --accent-light: #F5E6D3;
+  --accent2: #8BA88B;
+  --accent3: #D4A84B;
+  --accent4: #B85C4A;
+  --accent5: #6B8B8B;
+  --feed-bg: #F5E6D3; --feed-color: #C4956A;
+  --pee-bg: #F5F0D3; --pee-color: #A89B4B;
+  --poop-bg: #E8DDD0; --poop-color: #8B7560;
+  --sleep-bg: #D3E0D3; --sleep-color: #5A8B5A;
+  --colic-bg: #F0D5D0; --colic-color: #B85C4A;
+  --nav-bg: #FFFFFF;
+  --nav-active: #C4956A;
+  --nav-inactive: #B8A692;
+  --shadow: rgba(139, 117, 96, 0.1);
+  --border: #F0E6D8;
+  --progress-bg: #F5EDE3;
+  --success: #8BA88B;
+  --radius: 16px;
+  --radius-sm: 12px;
+}
+
+/* ========== THEME: MINIMAL NEUTRAL ========== */
+[data-active-theme="minimal"] {
+  --bg: #FAFAF8;
+  --bg-card: #FFFFFF;
+  --bg-secondary: #F5F3F0;
+  --text-primary: #2D2D2D;
+  --text-secondary: #7A7A7A;
+  --text-light: #AAAAAA;
+  --accent: #E8B4B8;
+  --accent-light: #FFF0F1;
+  --accent2: #B4C8D8;
+  --accent3: #C8D8B4;
+  --accent4: #D8C8E0;
+  --accent5: #D8D0C0;
+  --feed-bg: #FFF0F1; --feed-color: #D88A90;
+  --pee-bg: #FFF8E8; --pee-color: #C8A860;
+  --poop-bg: #F0EBE5; --poop-color: #9B8B78;
+  --sleep-bg: #EDF2F7; --sleep-color: #7A9BB8;
+  --colic-bg: #F5F0F8; --colic-color: #A088B8;
+  --nav-bg: #FFFFFF;
+  --nav-active: #E8B4B8;
+  --nav-inactive: #CCCCCC;
+  --shadow: rgba(0, 0, 0, 0.06);
+  --border: #F0EEEB;
+  --progress-bg: #F5F3F0;
+  --success: #88B898;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+/* ========== PHONE FRAME ========== */
+.phone-frame {
+  width: 375px;
+  height: 812px;
+  background: var(--bg);
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 8px #1a1a1a;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.phone-frame::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 28px;
+  background: #1a1a1a;
+  border-radius: 0 0 20px 20px;
+  z-index: 100;
+}
+
+/* ========== SCREEN CONTAINER ========== */
+.screen {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 20px 20px;
+  scrollbar-width: none;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ========== BOTTOM NAV ========== */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0 28px;
+  background: var(--nav-bg);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--nav-inactive);
+  transition: color 0.2s;
+  border: none;
+  background: none;
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+}
+.nav-item.active { color: var(--nav-active); }
+.nav-icon { font-size: 22px; line-height: 1; }
+.nav-label { font-size: 10px; }
+
+/* ========== SHARED COMPONENTS ========== */
+.screen-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.screen-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.section-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 16px 0 10px;
+}
+
+/* ========== HOME DASHBOARD ========== */
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+.home-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  border: 2px solid var(--accent);
+}
+.home-greeting {
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.home-baby-name {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.home-baby-age {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 20px;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.summary-card {
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.summary-icon { font-size: 24px; }
+.summary-value { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+.summary-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+.summary-sub { font-size: 11px; color: var(--text-light); }
+
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 0;
+  margin-bottom: 8px;
+  scrollbar-width: none;
+}
+.quick-actions::-webkit-scrollbar { display: none; }
+.quick-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 64px;
+  padding: 12px 8px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  transition: transform 0.15s;
+}
+.quick-btn:active { transform: scale(0.95); }
+.quick-btn-icon { font-size: 26px; }
+
+.last-activity {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.last-activity-icon { font-size: 20px; }
+.last-activity-time { font-weight: 700; color: var(--text-primary); }
+
+/* ========== ACTIVITY LOGGING ========== */
+.activity-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.activity-btn {
+  border-radius: var(--radius);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.activity-btn:active { transform: scale(0.96); }
+.activity-btn-icon { font-size: 40px; }
+.activity-btn-label { font-size: 15px; font-weight: 700; }
+.activity-btn-sub { font-size: 11px; opacity: 0.7; }
+.activity-btn.full-width {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  padding: 20px 24px;
+  gap: 16px;
+}
+.activity-btn.full-width .activity-btn-icon { font-size: 32px; }
+.activity-btn.full-width .activity-btn-info { text-align: left; }
+
+/* Activity form (shown on tap) */
+.activity-form {
+  display: none;
+}
+.activity-form.visible {
+  display: block;
+}
+.form-group {
+  margin-bottom: 14px;
+}
+.form-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: block;
+}
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+.form-row .form-group { flex: 1; }
+.form-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.form-btn:active { opacity: 0.85; }
+.form-btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+.timer-display {
+  text-align: center;
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--text-primary);
+  padding: 20px 0;
+  letter-spacing: 2px;
+}
+.timer-controls {
+  display: flex;
+  gap: 12px;
+}
+.timer-controls .form-btn { flex: 1; }
+
+/* ========== TIMELINE ========== */
+.timeline-date-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.date-arrow {
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text-light);
+  border: none;
+  background: none;
+  padding: 4px 8px;
+}
+.date-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.time-group-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 14px 0 8px;
+  padding-left: 4px;
+}
+.timeline-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  box-shadow: 0 1px 6px var(--shadow);
+  align-items: center;
+}
+.timeline-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.timeline-info { flex: 1; }
+.timeline-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.timeline-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.timeline-time { font-size: 12px; font-weight: 700; color: var(--text-light); white-space: nowrap; }
+
+/* ========== BABY PROFILE ========== */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0 20px;
+}
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  border: 3px solid var(--accent);
+  margin-bottom: 12px;
+}
+.profile-name {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.profile-dob {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.profile-age-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 20px;
+  margin-top: 8px;
+}
+.growth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.growth-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.growth-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.growth-unit {
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+.growth-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-top: 4px;
+}
+.growth-updated {
+  font-size: 10px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+.profile-edit-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+/* ========== MILESTONES ========== */
+.milestone-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.milestone-tabs::-webkit-scrollbar { display: none; }
+.milestone-tab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+.milestone-tab.active {
+  background: var(--accent);
+  color: white;
+}
+.milestone-progress {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.milestone-progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.milestone-progress-label { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.milestone-progress-value { font-size: 13px; font-weight: 700; color: var(--accent); }
+.milestone-progress-bar {
+  height: 8px;
+  background: var(--progress-bg);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.milestone-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--accent);
+  transition: width 0.5s;
+}
+.milestone-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 6px var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.milestone-check {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.milestone-check.done {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+.milestone-info { flex: 1; }
+.milestone-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.milestone-age { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+.milestone-date { font-size: 11px; color: var(--success); font-weight: 700; }
+
+/* ========== STATISTICS ========== */
+.stats-toggle {
+  display: flex;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 3px;
+  margin-bottom: 16px;
+}
+.stats-toggle-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-light);
+  transition: all 0.2s;
+}
+.stats-toggle-btn.active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.stat-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.stat-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.stat-avg { font-size: 12px; color: var(--text-light); font-weight: 600; }
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 100px;
+  padding: 0 4px;
+}
+.chart-bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.chart-bar {
+  width: 100%;
+  border-radius: 6px 6px 2px 2px;
+  min-height: 4px;
+  transition: height 0.5s;
+}
+.chart-bar-label { font-size: 10px; color: var(--text-light); font-weight: 600; }
+.stat-summary {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.stat-summary-item { text-align: center; }
+.stat-summary-value { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+.stat-summary-label { font-size: 11px; color: var(--text-light); font-weight: 600; }
+
+/* ========== SETTINGS ========== */
+.settings-group {
+  margin-bottom: 20px;
+}
+.settings-group-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  margin-bottom: 2px;
+  cursor: pointer;
+}
+.settings-item:first-of-type { border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.settings-item:last-of-type { border-radius: 0 0 var(--radius-sm) var(--radius-sm); margin-bottom: 0; }
+.settings-item:only-of-type { border-radius: var(--radius-sm); }
+.settings-icon { font-size: 22px; }
+.settings-label { flex: 1; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.settings-arrow { font-size: 14px; color: var(--text-light); }
+.settings-toggle {
+  width: 48px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.settings-toggle.on { background: var(--accent); }
+.settings-toggle::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.settings-toggle.on::after { transform: translateX(20px); }
+
+.settings-theme-preview {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+.theme-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  cursor: pointer;
+}
+.theme-dot.active { border-color: var(--accent); border-width: 3px; }
+
+.app-info {
+  text-align: center;
+  padding: 20px 0;
+  color: var(--text-light);
+  font-size: 13px;
+}
+.app-info-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- Theme selector (outside phone frame) -->
+<div class="theme-selector">
+  <button class="theme-btn active" data-theme="pastel" onclick="setTheme('pastel')">Soft Pastels</button>
+  <button class="theme-btn" data-theme="earthy" onclick="setTheme('earthy')">Earthy Warm</button>
+  <button class="theme-btn" data-theme="minimal" onclick="setTheme('minimal')">Minimal Neutral</button>
+</div>
+
+<!-- Phone Frame -->
+<div class="phone-frame" data-active-theme="pastel">
+
+  <!-- ==================== HOME DASHBOARD ==================== -->
+  <div class="screen active" id="screen-home">
+    <div class="home-header">
+      <div>
+        <div class="home-greeting">Good morning,</div>
+        <div class="home-baby-name">Emma's Day</div>
+        <div class="home-baby-age">4 months, 2 weeks old</div>
+      </div>
+      <div class="home-avatar" onclick="showScreen('profile')">👶</div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-card" style="background: var(--feed-bg);">
+        <div class="summary-icon">🍼</div>
+        <div class="summary-value">6</div>
+        <div class="summary-label" style="color: var(--feed-color);">Feedings</div>
+        <div class="summary-sub">Last: 45 min ago</div>
+      </div>
+      <div class="summary-card" style="background: var(--sleep-bg);">
+        <div class="summary-icon">😴</div>
+        <div class="summary-value">12h</div>
+        <div class="summary-label" style="color: var(--sleep-color);">Sleep</div>
+        <div class="summary-sub">2 naps + night</div>
+      </div>
+      <div class="summary-card" style="background: var(--pee-bg);">
+        <div class="summary-icon">💧</div>
+        <div class="summary-value">5</div>
+        <div class="summary-label" style="color: var(--pee-color);">Wet Diapers</div>
+        <div class="summary-sub">On track</div>
+      </div>
+      <div class="summary-card" style="background: var(--poop-bg);">
+        <div class="summary-icon">💩</div>
+        <div class="summary-value">2</div>
+        <div class="summary-label" style="color: var(--poop-color);">Dirty Diapers</div>
+        <div class="summary-sub">Normal</div>
+      </div>
+    </div>
+
+    <div class="section-label">Quick Log</div>
+    <div class="quick-actions">
+      <button class="quick-btn" style="background: var(--feed-bg); color: var(--feed-color);" onclick="showScreen('log')">
+        <span class="quick-btn-icon">🍼</span> Feed
+      </button>
+      <button class="quick-btn" style="background: var(--pee-bg); color: var(--pee-color);" onclick="showScreen('log')">
+        <span class="quick-btn-icon">💧</span> Pee
+      </button>
+      <button class="quick-btn" style="background: var(--poop-bg); color: var(--poop-color);" onclick="showScreen('log')">
+        <span class="quick-btn-icon">💩</span> Poop
+      </button>
+      <button class="quick-btn" style="background: var(--sleep-bg); color: var(--sleep-color);" onclick="showScreen('log')">
+        <span class="quick-btn-icon">😴</span> Sleep
+      </button>
+      <button class="quick-btn" style="background: var(--colic-bg); color: var(--colic-color);" onclick="showScreen('log')">
+        <span class="quick-btn-icon">😢</span> Colic
+      </button>
+    </div>
+
+    <div class="section-label">Last Activity</div>
+    <div class="last-activity">
+      <span class="last-activity-icon">🍼</span>
+      <div>
+        <div><span class="last-activity-time">Breastfed</span> — Left side, 15 min</div>
+        <div style="color: var(--text-light); font-size: 12px; margin-top: 2px;">45 minutes ago</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 14px; cursor: pointer;" onclick="showScreen('stats')">
+      <div class="card" style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 20px;">📊</span>
+          <span style="font-size: 14px; font-weight: 700; color: var(--text-primary);">View Statistics</span>
+        </div>
+        <span style="color: var(--text-light);">›</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ACTIVITY LOGGING ==================== -->
+  <div class="screen" id="screen-log">
+    <div class="screen-title">Log Activity</div>
+    <div class="screen-subtitle">What's happening with Emma?</div>
+
+    <div class="activity-grid" id="activity-buttons">
+      <button class="activity-btn" style="background: var(--feed-bg); color: var(--feed-color);" onclick="showActivityForm('feed')">
+        <span class="activity-btn-icon">🍼</span>
+        <span class="activity-btn-label">Feeding</span>
+        <span class="activity-btn-sub">Breast / Bottle</span>
+      </button>
+      <button class="activity-btn" style="background: var(--sleep-bg); color: var(--sleep-color);" onclick="showActivityForm('sleep')">
+        <span class="activity-btn-icon">😴</span>
+        <span class="activity-btn-label">Sleep</span>
+        <span class="activity-btn-sub">Nap / Night</span>
+      </button>
+      <button class="activity-btn" style="background: var(--pee-bg); color: var(--pee-color);" onclick="showActivityForm('pee')">
+        <span class="activity-btn-icon">💧</span>
+        <span class="activity-btn-label">Pee</span>
+        <span class="activity-btn-sub">Wet diaper</span>
+      </button>
+      <button class="activity-btn" style="background: var(--poop-bg); color: var(--poop-color);" onclick="showActivityForm('poop')">
+        <span class="activity-btn-icon">💩</span>
+        <span class="activity-btn-label">Poop</span>
+        <span class="activity-btn-sub">Dirty diaper</span>
+      </button>
+      <button class="activity-btn full-width" style="background: var(--colic-bg); color: var(--colic-color);" onclick="showActivityForm('colic')">
+        <span class="activity-btn-icon">😢</span>
+        <div class="activity-btn-info">
+          <span class="activity-btn-label">Colic</span><br>
+          <span class="activity-btn-sub">Crying / Discomfort</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Feed Form -->
+    <div class="activity-form" id="form-feed">
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+          <span style="font-size: 28px;">🍼</span>
+          <span style="font-size: 18px; font-weight: 800; color: var(--text-primary);">Log Feeding</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <div style="display: flex; gap: 8px;">
+            <button class="form-btn" style="flex:1; background: var(--feed-bg); color: var(--feed-color); font-size: 13px; padding: 10px;">Left Breast</button>
+            <button class="form-btn" style="flex:1; background: var(--bg-secondary); color: var(--text-secondary); font-size: 13px; padding: 10px;">Right Breast</button>
+            <button class="form-btn" style="flex:1; background: var(--bg-secondary); color: var(--text-secondary); font-size: 13px; padding: 10px;">Bottle</button>
+          </div>
+        </div>
+        <div class="timer-display">00:15:32</div>
+        <div class="timer-controls">
+          <button class="form-btn form-btn-secondary" style="flex:1;">Reset</button>
+          <button class="form-btn" style="flex:1;">Stop Timer</button>
+        </div>
+        <div class="form-group" style="margin-top: 14px;">
+          <label class="form-label">Notes (optional)</label>
+          <input class="form-input" placeholder="How did it go?">
+        </div>
+        <button class="form-btn">Save Feeding</button>
+        <button class="form-btn form-btn-secondary" onclick="hideActivityForm()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Sleep Form -->
+    <div class="activity-form" id="form-sleep">
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+          <span style="font-size: 28px;">😴</span>
+          <span style="font-size: 18px; font-weight: 800; color: var(--text-primary);">Log Sleep</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <div style="display: flex; gap: 8px;">
+            <button class="form-btn" style="flex:1; background: var(--sleep-bg); color: var(--sleep-color); font-size: 13px; padding: 10px;">Nap</button>
+            <button class="form-btn" style="flex:1; background: var(--bg-secondary); color: var(--text-secondary); font-size: 13px; padding: 10px;">Night Sleep</button>
+          </div>
+        </div>
+        <div class="timer-display">01:23:45</div>
+        <div class="timer-controls">
+          <button class="form-btn form-btn-secondary" style="flex:1;">Reset</button>
+          <button class="form-btn" style="flex:1; background: var(--sleep-color);">Stop Timer</button>
+        </div>
+        <div class="form-group" style="margin-top: 14px;">
+          <label class="form-label">Notes (optional)</label>
+          <input class="form-input" placeholder="Sleep quality, where, etc.">
+        </div>
+        <button class="form-btn" style="background: var(--sleep-color);">Save Sleep</button>
+        <button class="form-btn form-btn-secondary" onclick="hideActivityForm()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Simple forms for pee/poop/colic -->
+    <div class="activity-form" id="form-pee">
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+          <span style="font-size: 28px;">💧</span>
+          <span style="font-size: 18px; font-weight: 800; color: var(--text-primary);">Log Wet Diaper</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Time</label>
+            <input class="form-input" type="time" value="10:30">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Amount</label>
+            <div style="display: flex; gap: 6px;">
+              <button class="form-btn" style="flex:1; background: var(--bg-secondary); color: var(--text-secondary); font-size: 12px; padding: 10px;">Light</button>
+              <button class="form-btn" style="flex:1; background: var(--pee-bg); color: var(--pee-color); font-size: 12px; padding: 10px;">Normal</button>
+              <button class="form-btn" style="flex:1; background: var(--bg-secondary); color: var(--text-secondary); font-size: 12px; padding: 10px;">Heavy</button>
+            </div>
+          </div>
+        </div>
+        <button class="form-btn" style="background: var(--pee-color); margin-top: 8px;">Save</button>
+        <button class="form-btn form-btn-secondary" onclick="hideActivityForm()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="activity-form" id="form-poop">
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+          <span style="font-size: 28px;">💩</span>
+          <span style="font-size: 18px; font-weight: 800; color: var(--text-primary);">Log Dirty Diaper</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Time</label>
+            <input class="form-input" type="time" value="10:30">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Color</label>
+          <div style="display: flex; gap: 6px;">
+            <button class="form-btn" style="flex:1; background: #FFF3D6; color: #B89B4B; font-size: 12px; padding: 10px;">Yellow</button>
+            <button class="form-btn" style="flex:1; background: #E8DDD0; color: #8B7560; font-size: 12px; padding: 10px;">Brown</button>
+            <button class="form-btn" style="flex:1; background: #D3E0D3; color: #5A8B5A; font-size: 12px; padding: 10px;">Green</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Consistency</label>
+          <div style="display: flex; gap: 6px;">
+            <button class="form-btn" style="flex:1; background: var(--bg-secondary); color: var(--text-secondary); font-size: 12px; padding: 10px;">Liquid</button>
+            <button class="form-btn" style="flex:1; background: var(--poop-bg); color: var(--poop-color); font-size: 12px; padding: 10px;">Soft</button>
+            <button class="form-btn" style="flex:1; background: var(--bg-secondary); color: var(--text-secondary); font-size: 12px; padding: 10px;">Formed</button>
+          </div>
+        </div>
+        <button class="form-btn" style="background: var(--poop-color); margin-top: 8px;">Save</button>
+        <button class="form-btn form-btn-secondary" onclick="hideActivityForm()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="activity-form" id="form-colic">
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+          <span style="font-size: 28px;">😢</span>
+          <span style="font-size: 18px; font-weight: 800; color: var(--text-primary);">Log Colic Episode</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Intensity</label>
+          <div style="display: flex; gap: 6px;">
+            <button class="form-btn" style="flex:1; background: var(--bg-secondary); color: var(--text-secondary); font-size: 12px; padding: 10px;">Mild</button>
+            <button class="form-btn" style="flex:1; background: var(--colic-bg); color: var(--colic-color); font-size: 12px; padding: 10px;">Moderate</button>
+            <button class="form-btn" style="flex:1; background: var(--bg-secondary); color: var(--text-secondary); font-size: 12px; padding: 10px;">Severe</button>
+          </div>
+        </div>
+        <div class="timer-display" style="font-size: 36px;">00:42:10</div>
+        <div class="timer-controls">
+          <button class="form-btn form-btn-secondary" style="flex:1;">Reset</button>
+          <button class="form-btn" style="flex:1; background: var(--colic-color);">Stop Timer</button>
+        </div>
+        <div class="form-group" style="margin-top: 14px;">
+          <label class="form-label">What helped?</label>
+          <input class="form-input" placeholder="Rocking, white noise, etc.">
+        </div>
+        <button class="form-btn" style="background: var(--colic-color);">Save</button>
+        <button class="form-btn form-btn-secondary" onclick="hideActivityForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TIMELINE ==================== -->
+  <div class="screen" id="screen-timeline">
+    <div class="screen-title">Timeline</div>
+    <div class="screen-subtitle">Emma's day at a glance</div>
+
+    <div class="timeline-date-picker">
+      <button class="date-arrow">‹</button>
+      <span class="date-label">Today, Mar 7</span>
+      <button class="date-arrow" style="opacity: 0.3;">›</button>
+    </div>
+
+    <div class="time-group-label">🌙 Night</div>
+    <div class="timeline-item">
+      <div class="timeline-icon" style="background: var(--sleep-bg);">😴</div>
+      <div class="timeline-info">
+        <div class="timeline-title">Night Sleep</div>
+        <div class="timeline-detail">7h 30m — Woke once</div>
+      </div>
+      <div class="timeline-time">10:30 PM</div>
+    </div>
+
+    <div class="time-group-label">🌅 Morning</div>
+    <div class="timeline-item">
+      <div class="timeline-icon" style="background: var(--feed-bg);">🍼</div>
+      <div class="timeline-info">
+        <div class="timeline-title">Breastfed</div>
+        <div class="timeline-detail">Left side — 18 min</div>
+      </div>
+      <div class="timeline-time">6:05 AM</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-icon" style="background: var(--pee-bg);">💧</div>
+      <div class="timeline-info">
+        <div class="timeline-title">Wet Diaper</div>
+        <div class="timeline-detail">Normal amount</div>
+      </div>
+      <div class="timeline-time">6:30 AM</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-icon" style="background: var(--poop-bg);">💩</div>
+      <div class="timeline-info">
+        <div class="timeline-title">Dirty Diaper</div>
+        <div class="timeline-detail">Yellow, soft</div>
+      </div>
+      <div class="timeline-time">7:15 AM</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-icon" style="background: var(--sleep-bg);">😴</div>
+      <div class="timeline-info">
+        <div class="timeline-title">Morning Nap</div>
+        <div class="timeline-detail">1h 15m</div>
+      </div>
+      <div class="timeline-time">8:30 AM</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-icon" style="background: var(--feed-bg);">🍼</div>
+      <div class="timeline-info">
+        <div class="timeline-title">Bottle Fed</div>
+        <div class="timeline-detail">120ml formula</div>
+      </div>
+      <div class="timeline-time">9:50 AM</div>
+    </div>
+
+    <div class="time-group-label">☀️ Afternoon</div>
+    <div class="timeline-item">
+      <div class="timeline-icon" style="background: var(--pee-bg);">💧</div>
+      <div class="timeline-info">
+        <div class="timeline-title">Wet Diaper</div>
+        <div class="timeline-detail">Heavy</div>
+      </div>
+      <div class="timeline-time">12:10 PM</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-icon" style="background: var(--colic-bg);">😢</div>
+      <div class="timeline-info">
+        <div class="timeline-title">Colic Episode</div>
+        <div class="timeline-detail">Moderate — 25 min. White noise helped</div>
+      </div>
+      <div class="timeline-time">1:30 PM</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-icon" style="background: var(--feed-bg);">🍼</div>
+      <div class="timeline-info">
+        <div class="timeline-title">Breastfed</div>
+        <div class="timeline-detail">Right side — 12 min</div>
+      </div>
+      <div class="timeline-time">2:15 PM</div>
+    </div>
+  </div>
+
+  <!-- ==================== BABY PROFILE ==================== -->
+  <div class="screen" id="screen-profile">
+    <div class="profile-header">
+      <div class="profile-avatar">👶</div>
+      <div class="profile-name">Emma Rose</div>
+      <div class="profile-dob">Born October 21, 2025</div>
+      <div class="profile-age-badge">4 months, 2 weeks</div>
+    </div>
+
+    <div class="section-label">Growth</div>
+    <div class="growth-grid">
+      <div class="growth-card">
+        <div class="growth-value">6.2 <span class="growth-unit">kg</span></div>
+        <div class="growth-label">Weight</div>
+        <div class="growth-updated">Updated 3 days ago</div>
+      </div>
+      <div class="growth-card">
+        <div class="growth-value">63 <span class="growth-unit">cm</span></div>
+        <div class="growth-label">Height</div>
+        <div class="growth-updated">Updated 1 week ago</div>
+      </div>
+      <div class="growth-card">
+        <div class="growth-value">41 <span class="growth-unit">cm</span></div>
+        <div class="growth-label">Head Circ.</div>
+        <div class="growth-updated">Updated 1 week ago</div>
+      </div>
+      <div class="growth-card">
+        <div style="font-size: 28px; margin-bottom: 4px;">📈</div>
+        <div class="growth-label">Growth Chart</div>
+        <div class="growth-updated" style="color: var(--accent);">View trend</div>
+      </div>
+    </div>
+
+    <div class="section-label">Details</div>
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border);">
+        <span style="font-size: 13px; color: var(--text-secondary);">Blood Type</span>
+        <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">A+</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+        <span style="font-size: 13px; color: var(--text-secondary);">Allergies</span>
+        <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">None known</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+        <span style="font-size: 13px; color: var(--text-secondary);">Pediatrician</span>
+        <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Dr. Sarah Chen</span>
+      </div>
+    </div>
+
+    <button class="profile-edit-btn">Edit Profile</button>
+  </div>
+
+  <!-- ==================== MILESTONES ==================== -->
+  <div class="screen" id="screen-milestones">
+    <div class="screen-title">Milestones</div>
+    <div class="screen-subtitle">Emma's development journey</div>
+
+    <div class="milestone-tabs">
+      <button class="milestone-tab active">All</button>
+      <button class="milestone-tab">Motor</button>
+      <button class="milestone-tab">Social</button>
+      <button class="milestone-tab">Language</button>
+      <button class="milestone-tab">Cognitive</button>
+    </div>
+
+    <div class="milestone-progress">
+      <div class="milestone-progress-header">
+        <span class="milestone-progress-label">Overall Progress (0-6 months)</span>
+        <span class="milestone-progress-value">68%</span>
+      </div>
+      <div class="milestone-progress-bar">
+        <div class="milestone-progress-fill" style="width: 68%;"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Achieved</div>
+    <div class="milestone-card">
+      <div class="milestone-check done">✓</div>
+      <div class="milestone-info">
+        <div class="milestone-name">Social smile</div>
+        <div class="milestone-age">Expected: 1-2 months</div>
+        <div class="milestone-date">Achieved Feb 2</div>
+      </div>
+    </div>
+    <div class="milestone-card">
+      <div class="milestone-check done">✓</div>
+      <div class="milestone-info">
+        <div class="milestone-name">Holds head steady</div>
+        <div class="milestone-age">Expected: 2-4 months</div>
+        <div class="milestone-date">Achieved Jan 15</div>
+      </div>
+    </div>
+    <div class="milestone-card">
+      <div class="milestone-check done">✓</div>
+      <div class="milestone-info">
+        <div class="milestone-name">Coos and babbles</div>
+        <div class="milestone-age">Expected: 2-4 months</div>
+        <div class="milestone-date">Achieved Feb 20</div>
+      </div>
+    </div>
+    <div class="milestone-card">
+      <div class="milestone-check done">✓</div>
+      <div class="milestone-info">
+        <div class="milestone-name">Grasps objects</div>
+        <div class="milestone-age">Expected: 3-4 months</div>
+        <div class="milestone-date">Achieved Mar 1</div>
+      </div>
+    </div>
+
+    <div class="section-label">Coming Up</div>
+    <div class="milestone-card">
+      <div class="milestone-check"></div>
+      <div class="milestone-info">
+        <div class="milestone-name">Rolls over (tummy to back)</div>
+        <div class="milestone-age">Expected: 4-5 months</div>
+      </div>
+    </div>
+    <div class="milestone-card">
+      <div class="milestone-check"></div>
+      <div class="milestone-info">
+        <div class="milestone-name">Laughs out loud</div>
+        <div class="milestone-age">Expected: 3-5 months</div>
+      </div>
+    </div>
+    <div class="milestone-card">
+      <div class="milestone-check"></div>
+      <div class="milestone-info">
+        <div class="milestone-name">Sits with support</div>
+        <div class="milestone-age">Expected: 4-6 months</div>
+      </div>
+    </div>
+    <div class="milestone-card">
+      <div class="milestone-check"></div>
+      <div class="milestone-info">
+        <div class="milestone-name">Responds to own name</div>
+        <div class="milestone-age">Expected: 5-7 months</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== STATISTICS ==================== -->
+  <div class="screen" id="screen-stats">
+    <div class="screen-title">Statistics</div>
+    <div class="screen-subtitle">Patterns & trends</div>
+
+    <div class="stats-toggle">
+      <button class="stats-toggle-btn active">This Week</button>
+      <button class="stats-toggle-btn">This Month</button>
+    </div>
+
+    <!-- Feeding Stats -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">🍼 Daily Feedings</span>
+        <span class="stat-avg">Avg: 6.4/day</span>
+      </div>
+      <div class="chart-bars">
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 60px; background: var(--feed-bg);"></div>
+          <span class="chart-bar-label">M</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 75px; background: var(--feed-bg);"></div>
+          <span class="chart-bar-label">T</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 55px; background: var(--feed-bg);"></div>
+          <span class="chart-bar-label">W</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 80px; background: var(--feed-bg);"></div>
+          <span class="chart-bar-label">T</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 65px; background: var(--feed-bg);"></div>
+          <span class="chart-bar-label">F</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 70px; background: var(--feed-color);"></div>
+          <span class="chart-bar-label" style="font-weight: 800;">S</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 50px; background: var(--feed-bg);"></div>
+          <span class="chart-bar-label">S</span>
+        </div>
+      </div>
+      <div class="stat-summary">
+        <div class="stat-summary-item">
+          <div class="stat-summary-value">45</div>
+          <div class="stat-summary-label">Total feeds</div>
+        </div>
+        <div class="stat-summary-item">
+          <div class="stat-summary-value">14m</div>
+          <div class="stat-summary-label">Avg duration</div>
+        </div>
+        <div class="stat-summary-item">
+          <div class="stat-summary-value">2.5h</div>
+          <div class="stat-summary-label">Avg interval</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sleep Stats -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">😴 Daily Sleep</span>
+        <span class="stat-avg">Avg: 14.2h/day</span>
+      </div>
+      <div class="chart-bars">
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 85px; background: var(--sleep-bg);"></div>
+          <span class="chart-bar-label">M</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 78px; background: var(--sleep-bg);"></div>
+          <span class="chart-bar-label">T</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 90px; background: var(--sleep-bg);"></div>
+          <span class="chart-bar-label">W</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 72px; background: var(--sleep-bg);"></div>
+          <span class="chart-bar-label">T</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 82px; background: var(--sleep-bg);"></div>
+          <span class="chart-bar-label">F</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 76px; background: var(--sleep-color);"></div>
+          <span class="chart-bar-label" style="font-weight: 800;">S</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 88px; background: var(--sleep-bg);"></div>
+          <span class="chart-bar-label">S</span>
+        </div>
+      </div>
+      <div class="stat-summary">
+        <div class="stat-summary-item">
+          <div class="stat-summary-value">3.2</div>
+          <div class="stat-summary-label">Avg naps</div>
+        </div>
+        <div class="stat-summary-item">
+          <div class="stat-summary-value">10.5h</div>
+          <div class="stat-summary-label">Night avg</div>
+        </div>
+        <div class="stat-summary-item">
+          <div class="stat-summary-value">3.7h</div>
+          <div class="stat-summary-label">Nap avg</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diaper Stats -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">🧷 Daily Diapers</span>
+        <span class="stat-avg">Avg: 7.1/day</span>
+      </div>
+      <div class="chart-bars">
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 50px; background: var(--pee-bg);"></div>
+          <div class="chart-bar" style="height: 20px; background: var(--poop-bg); margin-top: 3px;"></div>
+          <span class="chart-bar-label">M</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 60px; background: var(--pee-bg);"></div>
+          <div class="chart-bar" style="height: 15px; background: var(--poop-bg); margin-top: 3px;"></div>
+          <span class="chart-bar-label">T</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 45px; background: var(--pee-bg);"></div>
+          <div class="chart-bar" style="height: 25px; background: var(--poop-bg); margin-top: 3px;"></div>
+          <span class="chart-bar-label">W</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 55px; background: var(--pee-bg);"></div>
+          <div class="chart-bar" style="height: 18px; background: var(--poop-bg); margin-top: 3px;"></div>
+          <span class="chart-bar-label">T</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 65px; background: var(--pee-bg);"></div>
+          <div class="chart-bar" style="height: 20px; background: var(--poop-bg); margin-top: 3px;"></div>
+          <span class="chart-bar-label">F</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 50px; background: var(--pee-color);"></div>
+          <div class="chart-bar" style="height: 22px; background: var(--poop-color); margin-top: 3px;"></div>
+          <span class="chart-bar-label" style="font-weight: 800;">S</span>
+        </div>
+        <div class="chart-bar-group">
+          <div class="chart-bar" style="height: 58px; background: var(--pee-bg);"></div>
+          <div class="chart-bar" style="height: 16px; background: var(--poop-bg); margin-top: 3px;"></div>
+          <span class="chart-bar-label">S</span>
+        </div>
+      </div>
+      <div class="stat-summary">
+        <div class="stat-summary-item">
+          <div class="stat-summary-value" style="color: var(--pee-color);">5.2</div>
+          <div class="stat-summary-label">Wet avg</div>
+        </div>
+        <div class="stat-summary-item">
+          <div class="stat-summary-value" style="color: var(--poop-color);">1.9</div>
+          <div class="stat-summary-label">Dirty avg</div>
+        </div>
+        <div class="stat-summary-item">
+          <div class="stat-summary-value">50</div>
+          <div class="stat-summary-label">Total week</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SETTINGS ==================== -->
+  <div class="screen" id="screen-settings">
+    <div class="screen-title">Settings</div>
+    <div class="screen-subtitle">Customize your experience</div>
+
+    <div class="settings-group">
+      <div class="settings-group-title">Baby</div>
+      <div class="settings-item" onclick="showScreen('profile')">
+        <span class="settings-icon">👶</span>
+        <span class="settings-label">Baby Profile</span>
+        <span class="settings-arrow">›</span>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-title">Notifications</div>
+      <div class="settings-item">
+        <span class="settings-icon">🍼</span>
+        <span class="settings-label">Feed Reminders</span>
+        <div class="settings-toggle on"></div>
+      </div>
+      <div class="settings-item">
+        <span class="settings-icon">😴</span>
+        <span class="settings-label">Nap Reminders</span>
+        <div class="settings-toggle on"></div>
+      </div>
+      <div class="settings-item">
+        <span class="settings-icon">💊</span>
+        <span class="settings-label">Medicine Reminders</span>
+        <div class="settings-toggle"></div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-title">Appearance</div>
+      <div class="settings-item" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0;">
+        <span class="settings-icon">🎨</span>
+        <span class="settings-label">Theme</span>
+      </div>
+      <div class="settings-theme-preview">
+        <div class="theme-dot active" style="background: #FDDEDE;" onclick="setTheme('pastel')"></div>
+        <div class="theme-dot" style="background: #F5E6D3;" onclick="setTheme('earthy')"></div>
+        <div class="theme-dot" style="background: #F0EEEB;" onclick="setTheme('minimal')"></div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-title">Data</div>
+      <div class="settings-item">
+        <span class="settings-icon">📤</span>
+        <span class="settings-label">Export Data</span>
+        <span class="settings-arrow">›</span>
+      </div>
+      <div class="settings-item">
+        <span class="settings-icon">☁️</span>
+        <span class="settings-label">Backup & Sync</span>
+        <span class="settings-arrow">›</span>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-title">About</div>
+      <div class="settings-item">
+        <span class="settings-icon">❓</span>
+        <span class="settings-label">Help & Support</span>
+        <span class="settings-arrow">›</span>
+      </div>
+      <div class="settings-item">
+        <span class="settings-icon">📋</span>
+        <span class="settings-label">Privacy Policy</span>
+        <span class="settings-arrow">›</span>
+      </div>
+    </div>
+
+    <div class="app-info">
+      <div class="app-info-name">Ollie</div>
+      Version 1.0.0
+    </div>
+  </div>
+
+  <!-- ==================== BOTTOM NAVIGATION ==================== -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="showScreen('home')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" onclick="showScreen('log')">
+      <span class="nav-icon">➕</span>
+      <span class="nav-label">Log</span>
+    </button>
+    <button class="nav-item" onclick="showScreen('timeline')">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">Timeline</span>
+    </button>
+    <button class="nav-item" onclick="showScreen('milestones')">
+      <span class="nav-icon">⭐</span>
+      <span class="nav-label">Milestones</span>
+    </button>
+    <button class="nav-item" onclick="showScreen('settings')">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Settings</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+function setTheme(theme) {
+  document.querySelector('.phone-frame').setAttribute('data-active-theme', theme);
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
+  // Update settings theme dots
+  const dots = document.querySelectorAll('.theme-dot');
+  if (dots.length === 3) {
+    dots[0].classList.toggle('active', theme === 'pastel');
+    dots[1].classList.toggle('active', theme === 'earthy');
+    dots[2].classList.toggle('active', theme === 'minimal');
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navMap = { home: 0, log: 1, timeline: 2, milestones: 3, settings: 4, profile: -1, stats: -1 };
+  const idx = navMap[id];
+  if (idx >= 0) document.querySelectorAll('.nav-item')[idx].classList.add('active');
+  // Reset activity forms when leaving log screen
+  if (id !== 'log') hideActivityForm();
+  // Scroll to top
+  document.getElementById('screen-' + id).scrollTop = 0;
+}
+
+function showActivityForm(type) {
+  document.getElementById('activity-buttons').style.display = 'none';
+  document.querySelectorAll('.activity-form').forEach(f => f.classList.remove('visible'));
+  document.getElementById('form-' + type).classList.add('visible');
+}
+
+function hideActivityForm() {
+  document.getElementById('activity-buttons').style.display = 'grid';
+  document.querySelectorAll('.activity-form').forEach(f => f.classList.remove('visible'));
+}
+
+// Toggle settings switches
+document.querySelectorAll('.settings-toggle').forEach(toggle => {
+  toggle.addEventListener('click', () => toggle.classList.toggle('on'));
+});
+
+// Milestone tab switching
+document.querySelectorAll('.milestone-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.milestone-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+
+// Stats toggle
+document.querySelectorAll('.stats-toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.stats-toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
