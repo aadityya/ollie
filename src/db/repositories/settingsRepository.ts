@@ -2,7 +2,7 @@ import { getDatabase } from '../database';
 
 export async function getSetting(key: string): Promise<string | null> {
   const db = await getDatabase();
-  const row = await db.getFirstAsync<{ value: string }>(
+  const row: any = await db.getFirstAsync(
     'SELECT value FROM settings WHERE key = ?',
     [key]
   );
@@ -19,7 +19,7 @@ export async function setSetting(key: string, value: string): Promise<void> {
 
 export async function getAllSettings(): Promise<Record<string, string>> {
   const db = await getDatabase();
-  const rows = await db.getAllAsync<{ key: string; value: string }>(
+  const rows: any[] = await db.getAllAsync(
     'SELECT key, value FROM settings'
   );
   const result: Record<string, string> = {};

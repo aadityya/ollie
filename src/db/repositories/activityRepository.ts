@@ -34,7 +34,7 @@ export async function getActivitiesForDate(
      ORDER BY started_at DESC`,
     [babyId, dateStr]
   );
-  return rows.map((r) => rowToActivity(r as Record<string, unknown>));
+  return rows.map((r: any) => rowToActivity(r as Record<string, unknown>));
 }
 
 export async function getTodaySummary(
@@ -50,13 +50,7 @@ export async function getTodaySummary(
   const db = await getDatabase();
   const today = new Date().toISOString().split('T')[0];
 
-  const counts = await db.getFirstAsync<{
-    feed_count: number;
-    pee_count: number;
-    poop_count: number;
-    colic_count: number;
-    sleep_minutes: number;
-  }>(
+  const counts = await db.getFirstAsync(
     `SELECT
        COALESCE(SUM(CASE WHEN type = 'feed' THEN 1 ELSE 0 END), 0) as feed_count,
        COALESCE(SUM(CASE WHEN type = 'pee' THEN 1 ELSE 0 END), 0) as pee_count,
@@ -129,5 +123,5 @@ export async function getActivitiesForDateRange(
      ORDER BY started_at DESC`,
     [babyId, startDate, endDate]
   );
-  return rows.map((r) => rowToActivity(r as Record<string, unknown>));
+  return rows.map((r: any) => rowToActivity(r as Record<string, unknown>));
 }

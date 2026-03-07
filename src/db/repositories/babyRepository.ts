@@ -21,7 +21,7 @@ function rowToBaby(row: Record<string, unknown>): Baby {
 export async function getAllBabies(): Promise<Baby[]> {
   const db = await getDatabase();
   const rows = await db.getAllAsync('SELECT * FROM babies ORDER BY created_at');
-  return rows.map((r) => rowToBaby(r as Record<string, unknown>));
+  return rows.map((r: any) => rowToBaby(r as Record<string, unknown>));
 }
 
 export async function getActiveBaby(): Promise<Baby | null> {
