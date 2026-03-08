@@ -31,7 +31,6 @@ import DashboardIcon from '../../assets/icons/dashboard.svg';
 // Baby profile icons
 import BoyIcon from '../../assets/icons/boy.svg';
 import GirlIcon from '../../assets/icons/girl.svg';
-import GenderNeutralIcon from '../../assets/icons/gender-neutral.svg';
 
 // Mood icons (for HappinessSlider)
 import MoodDistressedIcon from '../../assets/icons/mood-distressed.svg';
@@ -66,7 +65,6 @@ export const AppIcons: Record<string, IconComponent> = {
   // Baby profiles
   boy: BoyIcon,
   girl: GirlIcon,
-  genderNeutral: GenderNeutralIcon,
 };
 
 export const MoodIcons: IconComponent[] = [

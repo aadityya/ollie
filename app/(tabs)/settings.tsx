@@ -124,7 +124,6 @@ export default function SettingsScreen() {
               {([
                 { key: 'boy', label: 'Boy', icon: AppIcons.boy },
                 { key: 'girl', label: 'Girl', icon: AppIcons.girl },
-                { key: 'genderNeutral', label: 'Neutral', icon: AppIcons.genderNeutral },
               ] as const).map(({ key, label, icon: Icon }) => {
                 const isSelected = activeBaby.gender === key;
                 return (

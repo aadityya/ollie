@@ -10,7 +10,7 @@ function getBabyIcon(gender?: string): IconComponent {
   switch (gender) {
     case 'boy': return AppIcons.boy;
     case 'girl': return AppIcons.girl;
-    default: return AppIcons.genderNeutral;
+    default: return AppIcons.girl;
   }
 }
 

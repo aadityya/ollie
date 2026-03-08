@@ -130,7 +130,7 @@ export default function OnboardingScreen() {
 
               <Text style={[styles.label, { color: ollie.textSecondary }]}>Gender</Text>
               <View style={styles.genderRow}>
-                {(['boy', 'girl', 'genderNeutral'] as const).map((g) => (
+                {(['boy', 'girl'] as const).map((g) => (
                   <Pressable
                     key={g}
                     style={[
@@ -143,7 +143,7 @@ export default function OnboardingScreen() {
                     onPress={() => updateBaby(index, 'gender', g)}
                   >
                     <Text style={[styles.genderText, { color: baby.gender === g ? '#FFFFFF' : ollie.textSecondary }]}>
-                      {g === 'boy' ? 'Boy' : g === 'girl' ? 'Girl' : 'Neutral'}
+                      {g === 'boy' ? 'Boy' : 'Girl'}
                     </Text>
                   </Pressable>
                 ))}
