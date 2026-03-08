@@ -20,6 +20,7 @@ interface SettingsState {
   setOnboardingCompleted: (completed: boolean) => void;
   setUserName: (name: string) => void;
   addCustomActivityType: (type: string) => void;
+  updateCustomActivityType: (oldType: string, newType: string) => void;
   removeCustomActivityType: (type: string) => void;
 }
 
@@ -86,6 +87,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   addCustomActivityType: (type) => {
     const types = [...get().customActivityTypes, type];
+    set({ customActivityTypes: types });
+    settingsRepo.setSetting('custom_activity_types', JSON.stringify(types)).catch(() => {});
+  },
+
+  updateCustomActivityType: (oldType, newType) => {
+    const types = get().customActivityTypes.map((t) => (t === oldType ? newType : t));
     set({ customActivityTypes: types });
     settingsRepo.setSetting('custom_activity_types', JSON.stringify(types)).catch(() => {});
   },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ScrollView, View, StyleSheet, Alert, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +7,7 @@ import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { SettingsItem } from '@/src/components/SettingsItem';
 import { ThemeSelector } from '@/src/components/ThemeSelector';
 import { BabySwitcher } from '@/src/components/BabySwitcher';
+import { DateField } from '@/src/components/DateField';
 import { useAppTheme } from '@/src/theme';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { useBabyStore } from '@/src/stores/useBabyStore';
@@ -18,6 +19,7 @@ import { AppIcons } from '@/src/constants/icons';
 export default function SettingsScreen() {
   const { ollie } = useAppTheme();
   const router = useRouter();
+  const scrollRef = useRef<ScrollView>(null);
   const {
     theme,
     setTheme,
@@ -26,15 +28,32 @@ export default function SettingsScreen() {
     setUserName,
     customActivityTypes,
     addCustomActivityType,
+    updateCustomActivityType,
     removeCustomActivityType,
   } = useSettingsStore();
 
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(userName);
-  const [newActivity, setNewActivity] = useState('');
 
+  // Baby profile editing
+  const [editingBaby, setEditingBaby] = useState(false);
+  const [babyNameInput, setBabyNameInput] = useState('');
+  const [babyDobInput, setBabyDobInput] = useState('');
+  const [addingBaby, setAddingBaby] = useState(false);
+  const [newBabyName, setNewBabyName] = useState('');
+  const [newBabyDob, setNewBabyDob] = useState('');
+  const [newBabyGender, setNewBabyGender] = useState<string>('girl');
+
+  // Custom activities
+  const [newActivity, setNewActivity] = useState('');
+  const [editingActivity, setEditingActivity] = useState<string | null>(null);
+  const [editActivityInput, setEditActivityInput] = useState('');
+
+  const babies = useBabyStore((s) => s.babies);
   const activeBaby = useBabyStore((s) => s.activeBaby);
   const updateBaby = useBabyStore((s) => s.updateBaby);
+  const addBaby = useBabyStore((s) => s.addBaby);
+  const deleteBaby = useBabyStore((s) => s.deleteBaby);
   const setBabyTheme = useBabyStore((s) => s.setBabyTheme);
   const clearAll = useBabyStore((s) => s.clearAll);
 
@@ -46,6 +65,53 @@ export default function SettingsScreen() {
     } else {
       setTheme(t);
     }
+  };
+
+  const startEditBaby = () => {
+    if (!activeBaby) return;
+    setBabyNameInput(activeBaby.name);
+    setBabyDobInput(activeBaby.dateOfBirth);
+    setEditingBaby(true);
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300);
+  };
+
+  const handleSaveBaby = async () => {
+    if (!activeBaby || !babyNameInput.trim() || !babyDobInput.trim()) return;
+    await updateBaby(activeBaby.id, {
+      name: babyNameInput.trim(),
+      dateOfBirth: babyDobInput.trim(),
+    });
+    setEditingBaby(false);
+  };
+
+  const handleDeleteBaby = () => {
+    if (!activeBaby) return;
+    if (babies.length <= 1) {
+      Alert.alert('Cannot Delete', 'You need at least one baby profile.');
+      return;
+    }
+    Alert.alert('Delete Baby', `Delete "${activeBaby.name}" and all their data? This cannot be undone.`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete', style: 'destructive', onPress: async () => {
+          await deleteBaby(activeBaby.id);
+          setEditingBaby(false);
+        },
+      },
+    ]);
+  };
+
+  const handleAddBaby = async () => {
+    if (!newBabyName.trim() || !newBabyDob.trim()) return;
+    await addBaby({
+      name: newBabyName.trim(),
+      dateOfBirth: newBabyDob.trim(),
+      gender: newBabyGender,
+    });
+    setNewBabyName('');
+    setNewBabyDob('');
+    setNewBabyGender('girl');
+    setAddingBaby(false);
   };
 
   const handleResetApp = () => {
@@ -79,6 +145,7 @@ export default function SettingsScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
       <ScrollView
+        ref={scrollRef}
         style={[styles.container, { backgroundColor: ollie.bg }]}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -121,10 +188,10 @@ export default function SettingsScreen() {
         )}
 
         {/* Baby Profile */}
-        {activeBaby && (
+        <Text style={[styles.groupTitle, { color: ollie.textLight }]}>BABY PROFILE</Text>
+        {activeBaby && !editingBaby && (
           <>
-            <Text style={[styles.groupTitle, { color: ollie.textLight }]}>BABY PROFILE</Text>
-            <View style={[styles.iconPickerRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}>
+            <View style={[styles.iconPickerRow, { backgroundColor: ollie.bgCard, borderTopLeftRadius: ollie.radiusSm, borderTopRightRadius: ollie.radiusSm }]}>
               {([
                 { key: 'boy', label: 'Boy', icon: AppIcons.boy },
                 { key: 'girl', label: 'Girl', icon: AppIcons.girl },
@@ -147,26 +214,148 @@ export default function SettingsScreen() {
                 );
               })}
             </View>
+            <View style={[styles.babyActions, { backgroundColor: ollie.bgCard, borderBottomLeftRadius: ollie.radiusSm, borderBottomRightRadius: ollie.radiusSm }]}>
+              <Pressable onPress={startEditBaby}>
+                <Text style={[styles.babyActionText, { color: ollie.accent }]}>Edit</Text>
+              </Pressable>
+              <Pressable onPress={handleDeleteBaby}>
+                <Text style={[styles.babyActionText, { color: ollie.textLight }]}>Delete</Text>
+              </Pressable>
+            </View>
           </>
+        )}
+
+        {activeBaby && editingBaby && (
+          <View style={[styles.form, { backgroundColor: ollie.bgCard, borderRadius: ollie.radius }]}>
+            <Text style={[styles.formTitle, { color: ollie.textPrimary }]}>Edit Baby</Text>
+            <TextInput
+              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
+              value={babyNameInput}
+              onChangeText={setBabyNameInput}
+              placeholder="Baby's name"
+              placeholderTextColor={ollie.textLight}
+              onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
+            />
+            <View style={{ marginBottom: 10 }}>
+              <DateField value={babyDobInput} onChange={setBabyDobInput} label="Date of Birth" />
+            </View>
+            <View style={styles.formActions}>
+              <Pressable onPress={() => setEditingBaby(false)}>
+                <Text style={[styles.cancelBtn, { color: ollie.textSecondary }]}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.saveBtn, { backgroundColor: ollie.accent }]}
+                onPress={handleSaveBaby}
+                disabled={!babyNameInput.trim() || !babyDobInput.trim()}
+              >
+                <Text style={styles.saveBtnText}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
+
+        {!addingBaby ? (
+          <Pressable
+            style={[styles.addBtn, { borderColor: ollie.accent }]}
+            onPress={() => { setAddingBaby(true); setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300); }}
+          >
+            <Text style={[styles.addBtnText, { color: ollie.accent }]}>+ Add Baby</Text>
+          </Pressable>
+        ) : (
+          <View style={[styles.form, { backgroundColor: ollie.bgCard, borderRadius: ollie.radius }]}>
+            <Text style={[styles.formTitle, { color: ollie.textPrimary }]}>New Baby</Text>
+            <TextInput
+              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
+              value={newBabyName}
+              onChangeText={setNewBabyName}
+              placeholder="Baby's name"
+              placeholderTextColor={ollie.textLight}
+              autoFocus
+              onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
+            />
+            <View style={{ marginBottom: 10 }}>
+              <DateField value={newBabyDob} onChange={setNewBabyDob} label="Date of Birth" />
+            </View>
+            <View style={styles.genderRow}>
+              {([
+                { key: 'boy', label: 'Boy', icon: AppIcons.boy },
+                { key: 'girl', label: 'Girl', icon: AppIcons.girl },
+              ] as const).map(({ key, label, icon: Icon }) => (
+                <Pressable
+                  key={key}
+                  style={[
+                    styles.genderOption,
+                    newBabyGender === key && { backgroundColor: ollie.accentLight },
+                    { borderRadius: ollie.radiusSm },
+                  ]}
+                  onPress={() => setNewBabyGender(key)}
+                >
+                  <Icon width={36} height={36} />
+                  <Text style={[styles.genderLabel, { color: newBabyGender === key ? ollie.accent : ollie.textLight }]}>
+                    {label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+            <View style={styles.formActions}>
+              <Pressable onPress={() => setAddingBaby(false)}>
+                <Text style={[styles.cancelBtn, { color: ollie.textSecondary }]}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.saveBtn, { backgroundColor: ollie.accent }]}
+                onPress={handleAddBaby}
+                disabled={!newBabyName.trim() || !newBabyDob.trim()}
+              >
+                <Text style={styles.saveBtnText}>Add</Text>
+              </Pressable>
+            </View>
+          </View>
         )}
 
         {/* Custom Activities */}
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>CUSTOM ACTIVITIES</Text>
-        {customActivityTypes.map((type, i) => (
-          <SettingsItem
-            key={type}
-            icon="🏷️"
-            label={type}
-            onPress={() => {
-              Alert.alert('Remove Activity', `Remove "${type}"?`, [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Remove', style: 'destructive', onPress: () => removeCustomActivityType(type) },
-              ]);
-            }}
-            isFirst={i === 0}
-            isLast={i === customActivityTypes.length - 1}
-            isOnly={customActivityTypes.length === 1}
-          />
+        {customActivityTypes.map((type) => (
+          editingActivity === type ? (
+            <View key={type} style={[styles.nameEditRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm, marginBottom: 1 }]}>
+              <TextInput
+                style={[styles.nameInput, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
+                value={editActivityInput}
+                onChangeText={setEditActivityInput}
+                autoFocus
+                onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
+              />
+              <Pressable
+                style={[styles.nameSaveBtn, { backgroundColor: ollie.accent }]}
+                onPress={() => {
+                  if (editActivityInput.trim()) {
+                    updateCustomActivityType(type, editActivityInput.trim());
+                  }
+                  setEditingActivity(null);
+                }}
+              >
+                <Text style={styles.nameSaveBtnText}>Save</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <View
+              key={type}
+              style={[styles.activityRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}
+            >
+              <Text style={styles.activityEmoji}>🏷️</Text>
+              <Text style={[styles.activityLabel, { color: ollie.textPrimary }]}>{type}</Text>
+              <Pressable onPress={() => { setEditActivityInput(type); setEditingActivity(type); }}>
+                <Text style={[styles.activityAction, { color: ollie.accent }]}>Edit</Text>
+              </Pressable>
+              <Pressable onPress={() => {
+                Alert.alert('Delete Activity', `Delete "${type}"?`, [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'Delete', style: 'destructive', onPress: () => removeCustomActivityType(type) },
+                ]);
+              }}>
+                <Text style={[styles.activityAction, { color: ollie.textLight }]}>Delete</Text>
+              </Pressable>
+            </View>
+          )
         ))}
         <View style={[styles.addActivityRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}>
           <TextInput
@@ -175,6 +364,7 @@ export default function SettingsScreen() {
             onChangeText={setNewActivity}
             placeholder="New activity name..."
             placeholderTextColor={ollie.textLight}
+            onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
           />
           <Pressable
             onPress={() => {
@@ -289,6 +479,82 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Nunito_700Bold',
   },
+  iconPickerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    padding: 16,
+  },
+  iconPickerItem: {
+    alignItems: 'center',
+    padding: 12,
+    gap: 6,
+  },
+  iconPickerLabel: {
+    fontSize: 12,
+    fontFamily: 'Nunito_600SemiBold',
+  },
+  babyActions: {
+    flexDirection: 'row',
+    gap: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#f0e8df',
+  },
+  babyActionText: {
+    fontSize: 13,
+    fontFamily: 'Nunito_700Bold',
+  },
+  form: { padding: 16, marginTop: 8 },
+  formTitle: { fontSize: 16, fontFamily: 'Nunito_700Bold', marginBottom: 12 },
+  input: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    fontSize: 15,
+    fontFamily: 'Nunito_400Regular',
+    marginBottom: 10,
+  },
+  formActions: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 16, marginTop: 8 },
+  cancelBtn: { fontSize: 15, fontFamily: 'Nunito_600SemiBold' },
+  saveBtn: { paddingHorizontal: 24, paddingVertical: 10, borderRadius: 10 },
+  saveBtnText: { color: '#FFFFFF', fontSize: 15, fontFamily: 'Nunito_700Bold' },
+  addBtn: { borderWidth: 2, borderStyle: 'dashed', borderRadius: 14, padding: 14, alignItems: 'center', marginTop: 8 },
+  addBtnText: { fontSize: 15, fontFamily: 'Nunito_700Bold' },
+  genderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginBottom: 8,
+  },
+  genderOption: {
+    alignItems: 'center',
+    padding: 10,
+    gap: 4,
+  },
+  genderLabel: {
+    fontSize: 12,
+    fontFamily: 'Nunito_600SemiBold',
+  },
+  activityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 14,
+    marginBottom: 1,
+  },
+  activityEmoji: { fontSize: 22 },
+  activityLabel: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: 'Nunito_600SemiBold',
+  },
+  activityAction: {
+    fontSize: 13,
+    fontFamily: 'Nunito_700Bold',
+    marginLeft: 6,
+  },
   addActivityRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -305,19 +571,5 @@ const styles = StyleSheet.create({
   addActivityBtn: {
     fontSize: 14,
     fontFamily: 'Nunito_700Bold',
-  },
-  iconPickerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    padding: 16,
-  },
-  iconPickerItem: {
-    alignItems: 'center',
-    padding: 12,
-    gap: 6,
-  },
-  iconPickerLabel: {
-    fontSize: 12,
-    fontFamily: 'Nunito_600SemiBold',
   },
 });

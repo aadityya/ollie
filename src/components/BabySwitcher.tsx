@@ -3,7 +3,6 @@ import { View, StyleSheet, Pressable, Modal } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
-import { calculateAge } from '@/src/utils/dateHelpers';
 import { AppIcons, IconComponent } from '@/src/constants/icons';
 
 function getBabyIcon(gender?: string): IconComponent {
@@ -54,11 +53,6 @@ export function BabySwitcher({ compact }: BabySwitcherProps) {
         <Text style={[styles.babyName, { color: ollie.textPrimary }]}>
           {activeBaby?.name ?? 'No baby selected'}
         </Text>
-        {activeBaby?.dateOfBirth && (
-          <Text style={[styles.babyAge, { color: ollie.textLight }]}>
-            {calculateAge(activeBaby.dateOfBirth)}
-          </Text>
-        )}
       </View>
       {babies.length > 1 && (
         <Text style={[styles.switchLabel, { color: ollie.accent }]}>Switch</Text>
@@ -91,9 +85,6 @@ export function BabySwitcher({ compact }: BabySwitcherProps) {
                 >
                   <RowIcon width={28} height={28} />
                   <Text style={[styles.rowName, { color: ollie.textPrimary }]}>{baby.name}</Text>
-                  <Text style={[styles.rowAge, { color: ollie.textLight }]}>
-                    {calculateAge(baby.dateOfBirth)}
-                  </Text>
                   {baby.id === activeBaby?.id && (
                     <Text style={[styles.activeBadge, { color: ollie.accent }]}>Active</Text>
                   )}
@@ -136,10 +127,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Nunito_700Bold',
   },
-  babyAge: {
-    fontSize: 13,
-    marginTop: 2,
-  },
   switchLabel: {
     fontSize: 14,
     fontFamily: 'Nunito_700Bold',
@@ -171,10 +158,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontFamily: 'Nunito_700Bold',
-  },
-  rowAge: {
-    fontSize: 12,
-    marginRight: 8,
   },
   activeBadge: {
     fontSize: 12,
