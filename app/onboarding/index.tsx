@@ -7,6 +7,7 @@ import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { WelcomeBg } from '@/src/constants/icons';
+import { generateMockData } from '@/src/utils/mockData';
 
 interface BabyEntry {
   name: string;
@@ -19,8 +20,11 @@ export default function OnboardingScreen() {
   const addBaby = useBabyStore((s) => s.addBaby);
   const setOnboardingCompleted = useSettingsStore((s) => s.setOnboardingCompleted);
 
+  const loadBabies = useBabyStore((s) => s.loadBabies);
+
   const [babies, setBabies] = useState<BabyEntry[]>([{ name: '', dob: '' }]);
   const [saving, setSaving] = useState(false);
+  const [loadingMock, setLoadingMock] = useState(false);
 
   const isEntryValid = (entry: BabyEntry) =>
     entry.name.trim().length > 0 && /^\d{4}-\d{2}-\d{2}$/.test(entry.dob);
@@ -56,6 +60,20 @@ export default function OnboardingScreen() {
       console.error('Onboarding error:', e);
     }
     setSaving(false);
+  };
+
+  const handleMockData = async () => {
+    if (loadingMock) return;
+    setLoadingMock(true);
+    try {
+      await generateMockData();
+      await loadBabies();
+      setOnboardingCompleted(true);
+      router.replace('/');
+    } catch (e) {
+      console.error('Mock data error:', e);
+    }
+    setLoadingMock(false);
   };
 
   return (
@@ -122,10 +140,20 @@ export default function OnboardingScreen() {
           <Pressable
             style={[styles.button, { backgroundColor: hasAtLeastOneValid ? ollie.accent : ollie.bgSecondary }]}
             onPress={handleSave}
-            disabled={!hasAtLeastOneValid || saving}
+            disabled={!hasAtLeastOneValid || saving || loadingMock}
           >
             <Text style={[styles.buttonText, { color: hasAtLeastOneValid ? '#FFFFFF' : ollie.textLight }]}>
               {saving ? 'Setting up...' : "Let's Go!"}
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={[styles.mockBtn, { borderColor: ollie.textLight }]}
+            onPress={handleMockData}
+            disabled={saving || loadingMock}
+          >
+            <Text style={[styles.mockBtnText, { color: ollie.textSecondary }]}>
+              {loadingMock ? 'Generating data...' : 'Try with Mock Data'}
             </Text>
           </Pressable>
         </ScrollView>
@@ -213,5 +241,16 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     fontFamily: 'Nunito_700Bold',
+  },
+  mockBtn: {
+    marginTop: 12,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    alignItems: 'center',
+  },
+  mockBtnText: {
+    fontSize: 15,
+    fontFamily: 'Nunito_600SemiBold',
   },
 });
