@@ -74,4 +74,11 @@ export async function runMigrations(db: SQLiteDatabase): Promise<void> {
       value TEXT NOT NULL
     );
   `);
+
+  // v2 migration: add theme column to babies
+  try {
+    await db.execAsync(`ALTER TABLE babies ADD COLUMN theme TEXT`);
+  } catch {
+    // column already exists
+  }
 }

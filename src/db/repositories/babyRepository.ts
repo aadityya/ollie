@@ -1,5 +1,5 @@
 import { getDatabase } from '../database';
-import { Baby } from '@/src/types';
+import { Baby, ThemeName } from '@/src/types';
 import * as Crypto from 'expo-crypto';
 
 function rowToBaby(row: Record<string, unknown>): Baby {
@@ -12,6 +12,7 @@ function rowToBaby(row: Record<string, unknown>): Baby {
     allergies: row.allergies as string | undefined,
     pediatrician: row.pediatrician as string | undefined,
     photoUri: row.photo_uri as string | undefined,
+    theme: (row.theme as ThemeName) ?? undefined,
     isActive: (row.is_active as number) === 1,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -69,6 +70,7 @@ export async function updateBaby(
   if (data.allergies !== undefined) { fields.push('allergies = ?'); values.push(data.allergies); }
   if (data.pediatrician !== undefined) { fields.push('pediatrician = ?'); values.push(data.pediatrician); }
   if (data.photoUri !== undefined) { fields.push('photo_uri = ?'); values.push(data.photoUri); }
+  if (data.theme !== undefined) { fields.push('theme = ?'); values.push(data.theme); }
 
   if (fields.length === 0) return;
 
@@ -83,4 +85,12 @@ export async function setActiveBaby(id: string): Promise<void> {
   const db = await getDatabase();
   await db.runAsync('UPDATE babies SET is_active = 0');
   await db.runAsync('UPDATE babies SET is_active = 1 WHERE id = ?', [id]);
+}
+
+export async function deleteBaby(id: string): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync('DELETE FROM activities WHERE baby_id = ?', [id]);
+  await db.runAsync('DELETE FROM milestones WHERE baby_id = ?', [id]);
+  await db.runAsync('DELETE FROM growth_records WHERE baby_id = ?', [id]);
+  await db.runAsync('DELETE FROM babies WHERE id = ?', [id]);
 }

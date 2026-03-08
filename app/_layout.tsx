@@ -10,7 +10,7 @@ import {
 } from '@expo-google-fonts/nunito';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useOlliePaperTheme } from '@/src/theme';
+import { useOlliePaperTheme, useIsDarkTheme } from '@/src/theme';
 import { getDatabase } from '@/src/db/database';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { useBabyStore } from '@/src/stores/useBabyStore';
@@ -38,11 +38,12 @@ function useOnboardingRedirect() {
 
 function AppContent() {
   const theme = useOlliePaperTheme();
+  const isDark = useIsDarkTheme();
   useOnboardingRedirect();
 
   return (
     <PaperProvider theme={theme}>
-      <StatusBar style="dark" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -59,6 +60,10 @@ function AppContent() {
         <Stack.Screen name="profile/edit" />
         <Stack.Screen name="stats/index" />
         <Stack.Screen name="onboarding/index" />
+        <Stack.Screen
+          name="measurements/index"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
       </Stack>
     </PaperProvider>
   );

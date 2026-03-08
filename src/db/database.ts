@@ -15,3 +15,14 @@ export async function getDatabase() {
   }
   return db;
 }
+
+export async function resetDatabase(): Promise<void> {
+  const database = await getDatabase();
+  await database.execAsync(`
+    DELETE FROM activities;
+    DELETE FROM milestones;
+    DELETE FROM growth_records;
+    DELETE FROM settings;
+    DELETE FROM babies;
+  `);
+}

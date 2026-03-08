@@ -1,4 +1,4 @@
-export type ThemeName = 'pastel' | 'earthy' | 'minimal';
+export type ThemeName = 'pastel' | 'earthy' | 'minimal' | 'dark' | 'midnight' | 'ocean' | 'lavender' | 'monochrome';
 
 export type ActivityType = 'feed' | 'pee' | 'poop' | 'sleep' | 'colic';
 
@@ -19,6 +19,7 @@ export interface Baby {
   allergies?: string;
   pediatrician?: string;
   photoUri?: string;
+  theme?: ThemeName;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

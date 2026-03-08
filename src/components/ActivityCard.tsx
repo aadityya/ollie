@@ -10,9 +10,16 @@ interface ActivityCardProps {
   textColor: string;
   onPress: () => void;
   fullWidth?: boolean;
+  count?: number | string;
 }
 
-export function ActivityCard({ icon, label, subtitle, bgColor, textColor, onPress, fullWidth }: ActivityCardProps) {
+export function ActivityCard({ icon, label, subtitle, bgColor, textColor, onPress, fullWidth, count }: ActivityCardProps) {
+  const badge = count !== undefined && count !== 0 ? (
+    <View style={[styles.badge, { backgroundColor: textColor }]}>
+      <Text style={styles.badgeText}>{count}</Text>
+    </View>
+  ) : null;
+
   if (fullWidth) {
     return (
       <Pressable
@@ -20,10 +27,11 @@ export function ActivityCard({ icon, label, subtitle, bgColor, textColor, onPres
         onPress={onPress}
       >
         <Image source={icon} style={styles.iconFull} resizeMode="contain" />
-        <View>
+        <View style={styles.fullContent}>
           <Text style={[styles.label, { color: textColor }]}>{label}</Text>
           <Text style={[styles.subtitle, { color: textColor, opacity: 0.7 }]}>{subtitle}</Text>
         </View>
+        {badge}
       </Pressable>
     );
   }
@@ -33,6 +41,7 @@ export function ActivityCard({ icon, label, subtitle, bgColor, textColor, onPres
       style={[styles.container, { backgroundColor: bgColor }]}
       onPress={onPress}
     >
+      {badge}
       <Image source={icon} style={styles.icon} resizeMode="contain" />
       <Text style={[styles.label, { color: textColor }]}>{label}</Text>
       <Text style={[styles.subtitle, { color: textColor, opacity: 0.7 }]}>{subtitle}</Text>
@@ -64,6 +73,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 3,
   },
+  fullContent: { flex: 1 },
   icon: {
     width: 56,
     height: 56,
@@ -78,5 +88,21 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 11,
+  },
+  badge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    minWidth: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontFamily: 'Nunito_700Bold',
   },
 });

@@ -8,23 +8,48 @@ import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { WelcomeBg } from '@/src/constants/icons';
 
+interface BabyEntry {
+  name: string;
+  dob: string;
+}
+
 export default function OnboardingScreen() {
   const { ollie } = useAppTheme();
   const router = useRouter();
   const addBaby = useBabyStore((s) => s.addBaby);
   const setOnboardingCompleted = useSettingsStore((s) => s.setOnboardingCompleted);
 
-  const [name, setName] = useState('');
-  const [dob, setDob] = useState('');
+  const [babies, setBabies] = useState<BabyEntry[]>([{ name: '', dob: '' }]);
   const [saving, setSaving] = useState(false);
 
-  const isValid = name.trim().length > 0 && /^\d{4}-\d{2}-\d{2}$/.test(dob);
+  const isEntryValid = (entry: BabyEntry) =>
+    entry.name.trim().length > 0 && /^\d{4}-\d{2}-\d{2}$/.test(entry.dob);
+
+  const hasAtLeastOneValid = babies.some(isEntryValid);
+
+  const updateBaby = (index: number, field: keyof BabyEntry, value: string) => {
+    const updated = [...babies];
+    updated[index] = { ...updated[index], [field]: value };
+    setBabies(updated);
+  };
+
+  const addEntry = () => {
+    setBabies([...babies, { name: '', dob: '' }]);
+  };
+
+  const removeEntry = (index: number) => {
+    if (babies.length <= 1) return;
+    setBabies(babies.filter((_, i) => i !== index));
+  };
 
   const handleSave = async () => {
-    if (!isValid || saving) return;
+    if (!hasAtLeastOneValid || saving) return;
     setSaving(true);
     try {
-      await addBaby({ name: name.trim(), dateOfBirth: dob });
+      const validBabies = babies.filter(isEntryValid);
+      for (const baby of validBabies) {
+        await addBaby({ name: baby.name.trim(), dateOfBirth: baby.dob });
+      }
       setOnboardingCompleted(true);
       router.replace('/');
     } catch (e) {
@@ -49,40 +74,57 @@ export default function OnboardingScreen() {
             Welcome to Ollie
           </Text>
           <Text style={[styles.subtitle, { color: ollie.textSecondary }]}>
-            Let's get to know your little one
+            Add your little ones to get started
           </Text>
 
-          <View style={styles.form}>
-            <Text style={[styles.label, { color: ollie.textSecondary }]}>Baby's Name</Text>
-            <TextInput
-              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bgCard }]}
-              value={name}
-              onChangeText={setName}
-              placeholder="Emma"
-              placeholderTextColor={ollie.textLight}
-              autoFocus
-            />
+          {babies.map((baby, index) => (
+            <View key={index} style={[styles.babyCard, { backgroundColor: ollie.bgCard, borderColor: ollie.border }]}>
+              <View style={styles.cardHeader}>
+                <Text style={[styles.cardTitle, { color: ollie.textSecondary }]}>
+                  Baby {index + 1}
+                </Text>
+                {babies.length > 1 && (
+                  <Pressable onPress={() => removeEntry(index)}>
+                    <Text style={[styles.removeBtn, { color: ollie.textLight }]}>Remove</Text>
+                  </Pressable>
+                )}
+              </View>
 
-            <Text style={[styles.label, { color: ollie.textSecondary }]}>Date of Birth</Text>
-            <TextInput
-              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bgCard }]}
-              value={dob}
-              onChangeText={setDob}
-              placeholder="2025-10-21"
-              placeholderTextColor={ollie.textLight}
-              keyboardType="numbers-and-punctuation"
-            />
-            <Text style={[styles.hint, { color: ollie.textLight }]}>
-              Format: YYYY-MM-DD
-            </Text>
-          </View>
+              <Text style={[styles.label, { color: ollie.textSecondary }]}>Name</Text>
+              <TextInput
+                style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
+                value={baby.name}
+                onChangeText={(v) => updateBaby(index, 'name', v)}
+                placeholder="Emma"
+                placeholderTextColor={ollie.textLight}
+                autoFocus={index === 0}
+              />
+
+              <Text style={[styles.label, { color: ollie.textSecondary }]}>Date of Birth</Text>
+              <TextInput
+                style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
+                value={baby.dob}
+                onChangeText={(v) => updateBaby(index, 'dob', v)}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor={ollie.textLight}
+                keyboardType="numbers-and-punctuation"
+              />
+            </View>
+          ))}
 
           <Pressable
-            style={[styles.button, { backgroundColor: isValid ? ollie.accent : ollie.bgSecondary }]}
-            onPress={handleSave}
-            disabled={!isValid || saving}
+            style={[styles.addMoreBtn, { borderColor: ollie.accent }]}
+            onPress={addEntry}
           >
-            <Text style={[styles.buttonText, { color: isValid ? '#FFFFFF' : ollie.textLight }]}>
+            <Text style={[styles.addMoreText, { color: ollie.accent }]}>+ Add Another Baby</Text>
+          </Pressable>
+
+          <Pressable
+            style={[styles.button, { backgroundColor: hasAtLeastOneValid ? ollie.accent : ollie.bgSecondary }]}
+            onPress={handleSave}
+            disabled={!hasAtLeastOneValid || saving}
+          >
+            <Text style={[styles.buttonText, { color: hasAtLeastOneValid ? '#FFFFFF' : ollie.textLight }]}>
               {saving ? 'Setting up...' : "Let's Go!"}
             </Text>
           </Pressable>
@@ -98,13 +140,13 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     padding: 24,
-    justifyContent: 'center',
+    paddingBottom: 40,
   },
   heroImage: {
     width: '100%',
-    height: 260,
+    height: 220,
     alignSelf: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   title: {
     fontSize: 28,
@@ -115,28 +157,53 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
-  form: {
-    marginBottom: 32,
+  babyCard: {
+    borderRadius: 16,
+    borderWidth: 1.5,
+    padding: 16,
+    marginBottom: 12,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
+  },
+  removeBtn: {
+    fontSize: 13,
+    fontFamily: 'Nunito_600SemiBold',
   },
   label: {
     fontSize: 13,
     fontFamily: 'Nunito_700Bold',
     marginBottom: 6,
-    marginTop: 16,
+    marginTop: 8,
   },
   input: {
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 14,
-    borderWidth: 2,
-    fontSize: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    fontSize: 15,
     fontFamily: 'Nunito_400Regular',
   },
-  hint: {
-    fontSize: 12,
-    marginTop: 4,
+  addMoreBtn: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderRadius: 14,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  addMoreText: {
+    fontSize: 15,
+    fontFamily: 'Nunito_700Bold',
   },
   button: {
     paddingVertical: 16,

@@ -87,12 +87,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="milestones"
+        name="insights"
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon
               icon={AppIcons.milestones}
-              label="Milestones"
+              label="Insights"
               focused={focused}
               activeColor={ollie.navActive}
               inactiveColor={ollie.navInactive}
@@ -112,6 +112,13 @@ export default function TabLayout() {
               inactiveColor={ollie.navInactive}
             />
           ),
+        }}
+      />
+      {/* Hide milestones tab but keep the file */}
+      <Tabs.Screen
+        name="milestones"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
