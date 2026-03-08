@@ -1,19 +1,27 @@
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet, Pressable, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useAppTheme } from '@/src/theme';
 import { Activity } from '@/src/types';
-import { activityMeta, getActivityTitle, getActivityDetail } from '@/src/utils/activityHelpers';
+import { getMetaForType, getActivityTitle, getActivityDetail } from '@/src/utils/activityHelpers';
 import { formatTime } from '@/src/utils/dateHelpers';
 
 interface TimelineItemProps {
   activity: Activity;
+  onDelete?: () => void;
 }
 
-export function TimelineItem({ activity }: TimelineItemProps) {
+export function TimelineItem({ activity, onDelete }: TimelineItemProps) {
   const { ollie } = useAppTheme();
-  const meta = activityMeta[activity.type];
+  const meta = getMetaForType(activity.type);
   const colors = meta.getColors(ollie);
+
+  const handleDelete = () => {
+    Alert.alert('Delete Activity', 'Are you sure you want to delete this entry?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: onDelete },
+    ]);
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm, shadowColor: ollie.shadow }]}>
@@ -31,6 +39,11 @@ export function TimelineItem({ activity }: TimelineItemProps) {
       <Text style={[styles.time, { color: ollie.textLight }]}>
         {formatTime(activity.startedAt)}
       </Text>
+      {onDelete && (
+        <Pressable onPress={handleDelete} hitSlop={8}>
+          <Text style={[styles.deleteBtn, { color: ollie.textLight }]}>×</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -71,5 +84,10 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 12,
     fontFamily: 'Nunito_700Bold',
+  },
+  deleteBtn: {
+    fontSize: 22,
+    fontWeight: '300',
+    marginLeft: 4,
   },
 });

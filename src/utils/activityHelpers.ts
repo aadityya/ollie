@@ -40,10 +40,34 @@ export const activityMeta: Record<ActivityType, ActivityMeta> = {
     subtitle: 'Crying / Discomfort',
     getColors: (p) => p.colic,
   },
+  tummy_time: {
+    icon: AppIcons.bellyTime,
+    label: 'Tummy Time',
+    subtitle: 'Floor time',
+    getColors: (p) => ({ bg: p.accentLight, color: p.accent }),
+  },
+  sun_time: {
+    icon: AppIcons.sunTime,
+    label: 'Sun Time',
+    subtitle: 'Outdoor time',
+    getColors: () => ({ bg: '#FFF8E1', color: '#F59E0B' }),
+  },
 };
 
+export function getMetaForType(type: string): ActivityMeta {
+  if (type in activityMeta) {
+    return activityMeta[type as ActivityType];
+  }
+  return {
+    icon: AppIcons.log,
+    label: type,
+    subtitle: 'Custom',
+    getColors: (p) => ({ bg: p.bgSecondary, color: p.textPrimary }),
+  };
+}
+
 export function getActivityTitle(activity: {
-  type: ActivityType;
+  type: string;
   feedType?: string;
   sleepType?: string;
 }): string {
@@ -61,11 +85,17 @@ export function getActivityTitle(activity: {
       return 'Dirty Diaper';
     case 'colic':
       return 'Colic Episode';
+    case 'tummy_time':
+      return 'Tummy Time';
+    case 'sun_time':
+      return 'Sun Time';
+    default:
+      return activity.type;
   }
 }
 
 export function getActivityDetail(activity: {
-  type: ActivityType;
+  type: string;
   durationSeconds?: number;
   feedType?: string;
   bottleAmountMl?: number;

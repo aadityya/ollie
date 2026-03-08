@@ -8,6 +8,7 @@ import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import * as growthRepo from '@/src/db/repositories/growthRepository';
 import { GrowthRecord } from '@/src/types';
+import { calculatePercentile, getBabyAgeMonths } from '@/src/utils/growthPercentile';
 
 type MeasureType = 'weight' | 'height' | 'head';
 
@@ -89,6 +90,14 @@ export default function MeasurementsScreen() {
 
   const latestVal = chartData.length > 0 ? chartData[chartData.length - 1].value : null;
 
+  const percentileText = (() => {
+    if (!latestVal || !baby?.gender || !baby?.dateOfBirth) return null;
+    if (activeTab !== 'weight' && activeTab !== 'height') return null;
+    const ageMonths = getBabyAgeMonths(baby.dateOfBirth);
+    if (ageMonths < 0 || ageMonths > 24) return null;
+    return calculatePercentile(latestVal, ageMonths, baby.gender, activeTab);
+  })();
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: ollie.bg }]}>
       <ScrollView
@@ -138,6 +147,11 @@ export default function MeasurementsScreen() {
             <Text style={[styles.currentValue, { color: ollie.textPrimary }]}>
               {latestVal} {tabInfo.unit}
             </Text>
+            {percentileText && (
+              <Text style={[styles.percentileText, { color: ollie.accent }]}>
+                {percentileText} percentile
+              </Text>
+            )}
           </View>
         )}
 
@@ -284,6 +298,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   currentLabel: { fontSize: 13, marginBottom: 4 },
+  percentileText: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
+    marginTop: 6,
+  },
   currentValue: {
     fontSize: 32,
     fontFamily: 'Nunito_800ExtraBold',

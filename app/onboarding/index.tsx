@@ -12,6 +12,7 @@ import { generateMockData } from '@/src/utils/mockData';
 interface BabyEntry {
   name: string;
   dob: string;
+  gender: string;
 }
 
 export default function OnboardingScreen() {
@@ -22,7 +23,7 @@ export default function OnboardingScreen() {
 
   const loadBabies = useBabyStore((s) => s.loadBabies);
 
-  const [babies, setBabies] = useState<BabyEntry[]>([{ name: '', dob: '' }]);
+  const [babies, setBabies] = useState<BabyEntry[]>([{ name: '', dob: '', gender: '' }]);
   const [saving, setSaving] = useState(false);
   const [loadingMock, setLoadingMock] = useState(false);
 
@@ -38,7 +39,7 @@ export default function OnboardingScreen() {
   };
 
   const addEntry = () => {
-    setBabies([...babies, { name: '', dob: '' }]);
+    setBabies([...babies, { name: '', dob: '', gender: '' }]);
   };
 
   const removeEntry = (index: number) => {
@@ -52,7 +53,7 @@ export default function OnboardingScreen() {
     try {
       const validBabies = babies.filter(isEntryValid);
       for (const baby of validBabies) {
-        await addBaby({ name: baby.name.trim(), dateOfBirth: baby.dob });
+        await addBaby({ name: baby.name.trim(), dateOfBirth: baby.dob, gender: baby.gender || undefined });
       }
       setOnboardingCompleted(true);
       router.replace('/');
@@ -127,6 +128,27 @@ export default function OnboardingScreen() {
                 placeholderTextColor={ollie.textLight}
                 keyboardType="numbers-and-punctuation"
               />
+
+              <Text style={[styles.label, { color: ollie.textSecondary }]}>Gender</Text>
+              <View style={styles.genderRow}>
+                {(['boy', 'girl'] as const).map((g) => (
+                  <Pressable
+                    key={g}
+                    style={[
+                      styles.genderBtn,
+                      {
+                        backgroundColor: baby.gender === g ? ollie.accent : ollie.bgSecondary,
+                        borderRadius: 10,
+                      },
+                    ]}
+                    onPress={() => updateBaby(index, 'gender', g)}
+                  >
+                    <Text style={[styles.genderText, { color: baby.gender === g ? '#FFFFFF' : ollie.textSecondary }]}>
+                      {g === 'boy' ? 'Boy' : 'Girl'}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
             </View>
           ))}
 
@@ -220,6 +242,19 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     fontSize: 15,
     fontFamily: 'Nunito_400Regular',
+  },
+  genderRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  genderBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  genderText: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
   },
   addMoreBtn: {
     borderWidth: 2,

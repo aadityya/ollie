@@ -6,14 +6,18 @@ import { useAppTheme } from '@/src/theme';
 interface ScreenHeaderProps {
   title: string;
   subtitle?: string;
+  rightElement?: React.ReactNode;
 }
 
-export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
+export function ScreenHeader({ title, subtitle, rightElement }: ScreenHeaderProps) {
   const { ollie } = useAppTheme();
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: ollie.textPrimary }]}>{title}</Text>
+      <View style={styles.titleRow}>
+        <Text style={[styles.title, { color: ollie.textPrimary }]}>{title}</Text>
+        {rightElement}
+      </View>
       {subtitle && (
         <Text style={[styles.subtitle, { color: ollie.textSecondary }]}>
           {subtitle}
@@ -26,6 +30,11 @@ export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 20,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   title: {
     fontSize: 26,

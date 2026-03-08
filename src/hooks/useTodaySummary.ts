@@ -8,6 +8,8 @@ interface TodaySummary {
   poopCount: number;
   sleepMinutes: number;
   colicCount: number;
+  tummyTimeMinutes: number;
+  sunTimeMinutes: number;
   lastActivity: Activity | null;
 }
 
@@ -18,6 +20,8 @@ export function useTodaySummary(babyId: string | null) {
     poopCount: 0,
     sleepMinutes: 0,
     colicCount: 0,
+    tummyTimeMinutes: 0,
+    sunTimeMinutes: 0,
     lastActivity: null,
   });
   const [isLoading, setIsLoading] = useState(true);

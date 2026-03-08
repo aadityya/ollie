@@ -81,4 +81,41 @@ export async function runMigrations(db: SQLiteDatabase): Promise<void> {
   } catch {
     // column already exists
   }
+
+  // v3 migration: appointments, memories, happiness_records
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS appointments (
+      id TEXT PRIMARY KEY,
+      baby_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      date_time TEXT NOT NULL,
+      location TEXT,
+      notes TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (baby_id) REFERENCES babies(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_appointments_baby_date ON appointments(baby_id, date_time);
+
+    CREATE TABLE IF NOT EXISTS memories (
+      id TEXT PRIMARY KEY,
+      baby_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      date TEXT NOT NULL,
+      description TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (baby_id) REFERENCES babies(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_memories_baby_date ON memories(baby_id, date);
+
+    CREATE TABLE IF NOT EXISTS happiness_records (
+      id TEXT PRIMARY KEY,
+      baby_id TEXT NOT NULL,
+      date TEXT NOT NULL,
+      score INTEGER NOT NULL,
+      notes TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (baby_id) REFERENCES babies(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_happiness_baby_date ON happiness_records(baby_id, date);
+  `);
 }

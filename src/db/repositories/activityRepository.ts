@@ -45,6 +45,8 @@ export async function getTodaySummary(
   poopCount: number;
   sleepMinutes: number;
   colicCount: number;
+  tummyTimeMinutes: number;
+  sunTimeMinutes: number;
   lastActivity: Activity | null;
 }> {
   const db = await getDatabase();
@@ -56,7 +58,9 @@ export async function getTodaySummary(
        COALESCE(SUM(CASE WHEN type = 'pee' THEN 1 ELSE 0 END), 0) as pee_count,
        COALESCE(SUM(CASE WHEN type = 'poop' THEN 1 ELSE 0 END), 0) as poop_count,
        COALESCE(SUM(CASE WHEN type = 'colic' THEN 1 ELSE 0 END), 0) as colic_count,
-       COALESCE(SUM(CASE WHEN type = 'sleep' THEN duration_seconds ELSE 0 END), 0) / 60 as sleep_minutes
+       COALESCE(SUM(CASE WHEN type = 'sleep' THEN duration_seconds ELSE 0 END), 0) / 60 as sleep_minutes,
+       COALESCE(SUM(CASE WHEN type = 'tummy_time' THEN duration_seconds ELSE 0 END), 0) / 60 as tummy_time_minutes,
+       COALESCE(SUM(CASE WHEN type = 'sun_time' THEN duration_seconds ELSE 0 END), 0) / 60 as sun_time_minutes
      FROM activities
      WHERE baby_id = ? AND date(started_at) = date(?)`,
     [babyId, today]
@@ -75,6 +79,8 @@ export async function getTodaySummary(
     poopCount: counts?.poop_count ?? 0,
     sleepMinutes: counts?.sleep_minutes ?? 0,
     colicCount: counts?.colic_count ?? 0,
+    tummyTimeMinutes: counts?.tummy_time_minutes ?? 0,
+    sunTimeMinutes: counts?.sun_time_minutes ?? 0,
     lastActivity: lastRow ? rowToActivity(lastRow as Record<string, unknown>) : null,
   };
 }

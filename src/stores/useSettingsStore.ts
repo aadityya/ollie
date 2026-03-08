@@ -8,6 +8,8 @@ interface SettingsState {
   napReminderEnabled: boolean;
   medicineReminderEnabled: boolean;
   onboardingCompleted: boolean;
+  userName: string;
+  customActivityTypes: string[];
   isLoaded: boolean;
 
   loadSettings: () => Promise<void>;
@@ -16,6 +18,9 @@ interface SettingsState {
   toggleNapReminder: () => void;
   toggleMedicineReminder: () => void;
   setOnboardingCompleted: (completed: boolean) => void;
+  setUserName: (name: string) => void;
+  addCustomActivityType: (type: string) => void;
+  removeCustomActivityType: (type: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -24,6 +29,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   napReminderEnabled: true,
   medicineReminderEnabled: false,
   onboardingCompleted: false,
+  userName: 'Mom',
+  customActivityTypes: [],
   isLoaded: false,
 
   loadSettings: async () => {
@@ -35,6 +42,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         napReminderEnabled: all.nap_reminder !== 'false',
         medicineReminderEnabled: all.medicine_reminder === 'true',
         onboardingCompleted: all.onboarding_completed === 'true',
+        userName: all.user_name || 'Mom',
+        customActivityTypes: all.custom_activity_types ? JSON.parse(all.custom_activity_types) : [],
         isLoaded: true,
       });
     } catch {
@@ -68,5 +77,22 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setOnboardingCompleted: (completed) => {
     set({ onboardingCompleted: completed });
     settingsRepo.setSetting('onboarding_completed', String(completed)).catch(() => {});
+  },
+
+  setUserName: (name) => {
+    set({ userName: name });
+    settingsRepo.setSetting('user_name', name).catch(() => {});
+  },
+
+  addCustomActivityType: (type) => {
+    const types = [...get().customActivityTypes, type];
+    set({ customActivityTypes: types });
+    settingsRepo.setSetting('custom_activity_types', JSON.stringify(types)).catch(() => {});
+  },
+
+  removeCustomActivityType: (type) => {
+    const types = get().customActivityTypes.filter((t) => t !== type);
+    set({ customActivityTypes: types });
+    settingsRepo.setSetting('custom_activity_types', JSON.stringify(types)).catch(() => {});
   },
 }));

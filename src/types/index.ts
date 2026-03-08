@@ -1,6 +1,6 @@
 export type ThemeName = 'pastel' | 'earthy' | 'minimal' | 'dark' | 'midnight' | 'ocean' | 'lavender' | 'monochrome';
 
-export type ActivityType = 'feed' | 'pee' | 'poop' | 'sleep' | 'colic';
+export type ActivityType = 'feed' | 'pee' | 'poop' | 'sleep' | 'colic' | 'tummy_time' | 'sun_time';
 
 export type FeedType = 'breast_left' | 'breast_right' | 'bottle';
 export type PeeAmount = 'light' | 'normal' | 'heavy';
@@ -70,6 +70,34 @@ export interface GrowthRecord {
   weightKg?: number;
   heightCm?: number;
   headCircumferenceCm?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface Appointment {
+  id: string;
+  babyId: string;
+  title: string;
+  dateTime: string;
+  location?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface Memory {
+  id: string;
+  babyId: string;
+  title: string;
+  date: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface HappinessRecord {
+  id: string;
+  babyId: string;
+  date: string;
+  score: number; // 1-5
   notes?: string;
   createdAt: string;
 }

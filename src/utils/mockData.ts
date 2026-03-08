@@ -1,6 +1,7 @@
 import * as babyRepo from '@/src/db/repositories/babyRepository';
 import * as activityRepo from '@/src/db/repositories/activityRepository';
 import * as growthRepo from '@/src/db/repositories/growthRepository';
+import * as happinessRepo from '@/src/db/repositories/happinessRepository';
 import { FeedType, PeeAmount, PoopColor, PoopConsistency, SleepType, ColicIntensity } from '@/src/types';
 
 function rand(min: number, max: number): number {
@@ -111,6 +112,35 @@ async function generateActivitiesForDay(babyId: string, date: Date) {
       colicWhatHelped: pick(COLIC_HELPERS),
     });
   }
+
+  // Tummy time: 1-3 per day
+  const tummyCount = rand(1, 3);
+  for (let i = 0; i < tummyCount; i++) {
+    const durationSeconds = rand(180, 900); // 3-15 min
+    const startedAt = randomTime(date, 8 + i * 3, 10 + i * 3);
+    const endedAt = new Date(new Date(startedAt).getTime() + durationSeconds * 1000).toISOString();
+    await activityRepo.insertActivity({
+      babyId,
+      type: 'tummy_time',
+      startedAt,
+      endedAt,
+      durationSeconds,
+    });
+  }
+
+  // Sun time: 0-1 per day
+  if (Math.random() < 0.6) {
+    const durationSeconds = rand(300, 1200); // 5-20 min
+    const startedAt = randomTime(date, 9, 11);
+    const endedAt = new Date(new Date(startedAt).getTime() + durationSeconds * 1000).toISOString();
+    await activityRepo.insertActivity({
+      babyId,
+      type: 'sun_time',
+      startedAt,
+      endedAt,
+      durationSeconds,
+    });
+  }
 }
 
 async function generateGrowthRecords(
@@ -139,11 +169,29 @@ async function generateGrowthRecords(
   }
 }
 
+async function generateHappinessRecords(babyId: string, days: number) {
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    // ~70% chance of having a happiness record for any given day
+    if (Math.random() < 0.7) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      await happinessRepo.upsertHappiness({
+        babyId,
+        date: dateStr,
+        score: rand(2, 5), // bias towards positive
+      });
+    }
+  }
+}
+
 export async function generateMockData(): Promise<string> {
   // Create Jane (6 months old)
   const jane = await babyRepo.insertBaby({
     name: 'Jane',
     dateOfBirth: '2025-09-07',
+    gender: 'girl',
   });
   await babyRepo.updateBaby(jane.id, { theme: 'lavender' });
 
@@ -151,6 +199,7 @@ export async function generateMockData(): Promise<string> {
   const jack = await babyRepo.insertBaby({
     name: 'Jack',
     dateOfBirth: '2025-12-07',
+    gender: 'boy',
   });
   await babyRepo.updateBaby(jack.id, { theme: 'ocean' });
 
@@ -174,6 +223,10 @@ export async function generateMockData(): Promise<string> {
 
   // Jack: ~3 months old, starting around 4.0kg
   await generateGrowthRecords(jack.id, threeMonthsAgo, 13, 4.0, 52, 36, 0.2, 0.6, 0.35);
+
+  // Happiness records for 30 days
+  await generateHappinessRecords(jane.id, 30);
+  await generateHappinessRecords(jack.id, 30);
 
   // Set Jane as active
   await babyRepo.setActiveBaby(jane.id);

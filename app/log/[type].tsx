@@ -4,15 +4,13 @@ import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAppTheme } from '@/src/theme';
-import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { Timer } from '@/src/components/Timer';
 import { SegmentedControl } from '@/src/components/SegmentedControl';
 import { OptionSelector } from '@/src/components/OptionSelector';
 import { useTimer } from '@/src/hooks/useTimer';
 import { useActivityStore } from '@/src/stores/useActivityStore';
 import { useBabyStore } from '@/src/stores/useBabyStore';
-import { activityMeta } from '@/src/utils/activityHelpers';
-import { VersionBadge } from '@/src/components/VersionBadge';
+import { getMetaForType } from '@/src/utils/activityHelpers';
 import {
   ActivityType,
   FeedType,
@@ -29,9 +27,12 @@ const titles: Record<string, string> = {
   pee: 'Log Wet Diaper',
   poop: 'Log Dirty Diaper',
   colic: 'Log Colic Episode',
+  tummy_time: 'Log Tummy Time',
+  sun_time: 'Log Sun Time',
 };
 
-const hasTimer = (type: string) => ['feed', 'sleep', 'colic'].includes(type);
+const timerTypes = ['feed', 'sleep', 'colic', 'tummy_time', 'sun_time'];
+const hasTimer = (type: string) => timerTypes.includes(type);
 
 export default function ActivityFormScreen() {
   const { type } = useLocalSearchParams<{ type: string }>();
@@ -40,9 +41,9 @@ export default function ActivityFormScreen() {
   const saveActivity = useActivityStore((s) => s.saveActivity);
   const babyId = useBabyStore((s) => s.activeBaby?.id);
 
-  const activityType = (type as ActivityType) ?? 'feed';
-  const meta = activityMeta[activityType];
-  const colors = meta?.getColors(ollie) ?? { bg: ollie.accentLight, color: ollie.accent };
+  const activityType = type ?? 'feed';
+  const meta = getMetaForType(activityType);
+  const colors = meta.getColors(ollie);
 
   const timer = useTimer();
   const [saving, setSaving] = useState(false);
@@ -82,7 +83,7 @@ export default function ActivityFormScreen() {
     try {
       await saveActivity({
         babyId,
-        type: activityType,
+        type: activityType as ActivityType,
         startedAt,
         endedAt: now,
         durationSeconds: durationSeconds || undefined,
@@ -247,7 +248,7 @@ export default function ActivityFormScreen() {
         <View style={[styles.header, { backgroundColor: colors.bg }]}>
           {meta?.icon && <Image source={meta.icon} style={styles.headerIcon} resizeMode="contain" />}
           <Text style={[styles.headerTitle, { color: colors.color }]}>
-            {titles[activityType] ?? 'Log Activity'}
+            {titles[activityType] ?? `Log ${activityType}`}
           </Text>
         </View>
 
@@ -286,8 +287,6 @@ export default function ActivityFormScreen() {
             {saving ? 'Saving...' : 'Save'}
           </Text>
         </Pressable>
-
-        <VersionBadge />
       </ScrollView>
     </SafeAreaView>
   );

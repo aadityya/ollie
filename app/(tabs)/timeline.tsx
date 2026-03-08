@@ -10,9 +10,9 @@ import { EmptyState } from '@/src/components/EmptyState';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useTimelineStore } from '@/src/stores/useTimelineStore';
+import { useActivityStore } from '@/src/stores/useActivityStore';
 import { getTimeOfDayGroup, getTimeOfDayLabel } from '@/src/utils/dateHelpers';
 import { Activity } from '@/src/types';
-import { VersionBadge } from '@/src/components/VersionBadge';
 
 function groupByTimeOfDay(activities: Activity[]): Record<string, Activity[]> {
   const groups: Record<string, Activity[]> = {};
@@ -32,6 +32,7 @@ export default function TimelineScreen() {
   const babyName = useBabyStore((s) => s.activeBaby?.name ?? 'your baby');
   const { selectedDate, activities, isLoading, goToPreviousDay, goToNextDay, loadActivities } =
     useTimelineStore();
+  const deleteActivity = useActivityStore((s) => s.deleteActivity);
 
   useFocusEffect(
     useCallback(() => {
@@ -45,6 +46,11 @@ export default function TimelineScreen() {
     () => TIME_ORDER.filter((g) => grouped[g]?.length),
     [grouped]
   );
+
+  const handleDelete = async (activityId: string) => {
+    await deleteActivity(activityId);
+    if (babyId) loadActivities(babyId);
+  };
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: ollie.bg }]} edges={['top']}>
@@ -76,13 +82,15 @@ export default function TimelineScreen() {
                 {getTimeOfDayLabel(group)}
               </Text>
               {grouped[group].map((activity) => (
-                <TimelineItem key={activity.id} activity={activity} />
+                <TimelineItem
+                  key={activity.id}
+                  activity={activity}
+                  onDelete={() => handleDelete(activity.id)}
+                />
               ))}
             </View>
           ))
         )}
-
-        <VersionBadge />
       </ScrollView>
     </SafeAreaView>
   );

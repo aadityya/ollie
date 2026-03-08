@@ -1,5 +1,5 @@
-import React from 'react';
-import { ScrollView, View, StyleSheet, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, View, StyleSheet, Alert, TextInput, Pressable } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -28,7 +28,16 @@ export default function SettingsScreen() {
     toggleNapReminder,
     toggleMedicineReminder,
     setOnboardingCompleted,
+    userName,
+    setUserName,
+    customActivityTypes,
+    addCustomActivityType,
+    removeCustomActivityType,
   } = useSettingsStore();
+
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState(userName);
+  const [newActivity, setNewActivity] = useState('');
 
   const activeBaby = useBabyStore((s) => s.activeBaby);
   const setBabyTheme = useBabyStore((s) => s.setBabyTheme);
@@ -77,8 +86,77 @@ export default function SettingsScreen() {
       >
         <ScreenHeader title="Settings" subtitle="Customize your experience" />
 
+        {/* Profile */}
+        <Text style={[styles.groupTitle, { color: ollie.textLight }]}>PROFILE</Text>
+        {editingName ? (
+          <View style={[styles.nameEditRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}>
+            <TextInput
+              style={[styles.nameInput, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
+              value={nameInput}
+              onChangeText={setNameInput}
+              placeholder="Your name"
+              placeholderTextColor={ollie.textLight}
+              autoFocus
+            />
+            <Pressable
+              style={[styles.nameSaveBtn, { backgroundColor: ollie.accent }]}
+              onPress={() => {
+                if (nameInput.trim()) setUserName(nameInput.trim());
+                setEditingName(false);
+              }}
+            >
+              <Text style={styles.nameSaveBtnText}>Save</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <SettingsItem
+            icon="👤"
+            label={`Name: ${userName}`}
+            onPress={() => { setNameInput(userName); setEditingName(true); }}
+            isOnly
+          />
+        )}
+
         {/* Baby Switcher */}
         <BabySwitcher />
+
+        {/* Custom Activities */}
+        <Text style={[styles.groupTitle, { color: ollie.textLight }]}>CUSTOM ACTIVITIES</Text>
+        {customActivityTypes.map((type, i) => (
+          <SettingsItem
+            key={type}
+            icon="🏷️"
+            label={type}
+            onPress={() => {
+              Alert.alert('Remove Activity', `Remove "${type}"?`, [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Remove', style: 'destructive', onPress: () => removeCustomActivityType(type) },
+              ]);
+            }}
+            isFirst={i === 0}
+            isLast={i === customActivityTypes.length - 1}
+            isOnly={customActivityTypes.length === 1}
+          />
+        ))}
+        <View style={[styles.addActivityRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}>
+          <TextInput
+            style={[styles.addActivityInput, { color: ollie.textPrimary }]}
+            value={newActivity}
+            onChangeText={setNewActivity}
+            placeholder="New activity name..."
+            placeholderTextColor={ollie.textLight}
+          />
+          <Pressable
+            onPress={() => {
+              if (newActivity.trim()) {
+                addCustomActivityType(newActivity.trim());
+                setNewActivity('');
+              }
+            }}
+          >
+            <Text style={[styles.addActivityBtn, { color: ollie.accent }]}>+ Add</Text>
+          </Pressable>
+        </View>
 
         {/* Notifications */}
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>NOTIFICATIONS</Text>
@@ -178,5 +256,47 @@ const styles = StyleSheet.create({
   },
   appVersion: {
     fontSize: 13,
+  },
+  nameEditRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 12,
+  },
+  nameInput: {
+    flex: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    fontSize: 15,
+    fontFamily: 'Nunito_400Regular',
+  },
+  nameSaveBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  nameSaveBtnText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
+  },
+  addActivityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    gap: 10,
+    marginTop: 2,
+  },
+  addActivityInput: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: 'Nunito_400Regular',
+  },
+  addActivityBtn: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
   },
 });

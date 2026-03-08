@@ -8,20 +8,24 @@ import { SummaryCard } from '@/src/components/SummaryCard';
 import { QuickActionButton } from '@/src/components/QuickActionButton';
 import { TimelineItem } from '@/src/components/TimelineItem';
 import { EmptyState } from '@/src/components/EmptyState';
-import { VersionBadge } from '@/src/components/VersionBadge';
+import { HappinessSlider } from '@/src/components/HappinessSlider';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
+import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { useTodaySummary } from '@/src/hooks/useTodaySummary';
-import { getGreeting, calculateAge, formatTimeAgo } from '@/src/utils/dateHelpers';
+import { getGreeting, calculateAge, formatTimeAgo, todayDateStr } from '@/src/utils/dateHelpers';
 import { activityMeta } from '@/src/utils/activityHelpers';
 import { formatDuration } from '@/src/utils/dateHelpers';
+import { getDailyPhrase } from '@/src/constants/motivationalPhrases';
 import { ActivityType } from '@/src/types';
 import { AppIcons } from '@/src/constants/icons';
+import { APP_VERSION } from '@/src/constants/version';
 
 export default function HomeScreen() {
   const { ollie } = useAppTheme();
   const router = useRouter();
   const baby = useBabyStore((s) => s.activeBaby);
+  const userName = useSettingsStore((s) => s.userName);
   const babyName = baby?.name ?? 'your baby';
   const age = baby?.dateOfBirth ? calculateAge(baby.dateOfBirth) : '';
 
@@ -33,7 +37,7 @@ export default function HomeScreen() {
     }, [refresh])
   );
 
-  const quickActions: ActivityType[] = ['feed', 'sleep', 'pee', 'poop', 'colic'];
+  const quickActions: ActivityType[] = ['feed', 'sleep', 'pee', 'poop', 'colic', 'tummy_time', 'sun_time'];
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: ollie.bg }]} edges={['top']}>
@@ -43,9 +47,14 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ScreenHeader
-          title={`${getGreeting()} ${babyName}`}
-          subtitle={age}
+          title={`${getGreeting()} ${userName}!`}
+          subtitle={`${babyName} is ${age}`}
+          rightElement={<Text style={[styles.versionBadge, { color: ollie.textLight }]}>v{APP_VERSION}</Text>}
         />
+
+        <Text style={[styles.motivational, { color: ollie.textLight }]}>
+          {getDailyPhrase()}
+        </Text>
 
         {/* Summary Cards */}
         <View style={styles.summaryGrid}>
@@ -95,6 +104,9 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* Happiness */}
+        <HappinessSlider babyId={baby?.id} date={todayDateStr()} />
+
         {/* Quick Actions */}
         <Text style={[styles.sectionTitle, { color: ollie.textPrimary }]}>Quick Log</Text>
         <ScrollView
@@ -136,8 +148,6 @@ export default function HomeScreen() {
             subtitle="Tap Quick Log above to start tracking"
           />
         )}
-
-        <VersionBadge />
       </ScrollView>
     </SafeAreaView>
   );
@@ -147,7 +157,14 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   container: { flex: 1 },
   content: { padding: 20, paddingTop: 16, paddingBottom: 40 },
-  summaryGrid: { gap: 12, marginBottom: 24 },
+  motivational: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginBottom: 20,
+    marginTop: -4,
+  },
+  summaryGrid: { gap: 12, marginBottom: 20 },
   summaryRow: { flexDirection: 'row', gap: 12 },
   summaryCell: { flex: 1 },
   sectionTitle: {
@@ -163,5 +180,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     marginTop: 4,
+  },
+  versionBadge: {
+    fontSize: 12,
+    fontFamily: 'Nunito_600SemiBold',
   },
 });

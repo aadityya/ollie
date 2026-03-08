@@ -22,6 +22,9 @@ export async function resetDatabase(): Promise<void> {
     DELETE FROM activities;
     DELETE FROM milestones;
     DELETE FROM growth_records;
+    DELETE FROM appointments;
+    DELETE FROM memories;
+    DELETE FROM happiness_records;
     DELETE FROM settings;
     DELETE FROM babies;
   `);
