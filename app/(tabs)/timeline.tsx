@@ -7,6 +7,7 @@ import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { DatePicker } from '@/src/components/DatePicker';
 import { TimelineItem } from '@/src/components/TimelineItem';
 import { EmptyState } from '@/src/components/EmptyState';
+import { BabySwitcher } from '@/src/components/BabySwitcher';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useTimelineStore } from '@/src/stores/useTimelineStore';
@@ -59,7 +60,7 @@ export default function TimelineScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <ScreenHeader title="Timeline" subtitle={`${babyName}'s day at a glance`} />
+        <ScreenHeader title="Timeline" subtitle={`${babyName}'s day at a glance`} rightElement={<BabySwitcher compact />} />
 
         <DatePicker
           date={selectedDate}

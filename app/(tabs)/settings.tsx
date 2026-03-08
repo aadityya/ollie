@@ -12,7 +12,6 @@ import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { resetDatabase } from '@/src/db/database';
 import { APP_VERSION } from '@/src/constants/version';
-import { AppIcons } from '@/src/constants/icons';
 import { ThemeName } from '@/src/types';
 
 export default function SettingsScreen() {
@@ -21,12 +20,6 @@ export default function SettingsScreen() {
   const {
     theme,
     setTheme,
-    feedReminderEnabled,
-    napReminderEnabled,
-    medicineReminderEnabled,
-    toggleFeedReminder,
-    toggleNapReminder,
-    toggleMedicineReminder,
     setOnboardingCompleted,
     userName,
     setUserName,
@@ -157,32 +150,6 @@ export default function SettingsScreen() {
             <Text style={[styles.addActivityBtn, { color: ollie.accent }]}>+ Add</Text>
           </Pressable>
         </View>
-
-        {/* Notifications */}
-        <Text style={[styles.groupTitle, { color: ollie.textLight }]}>NOTIFICATIONS</Text>
-        <SettingsItem
-          icon={AppIcons.feed}
-          label="Feed Reminders"
-          type="toggle"
-          value={feedReminderEnabled}
-          onToggle={toggleFeedReminder}
-          isFirst
-        />
-        <SettingsItem
-          icon={AppIcons.sleep}
-          label="Nap Reminders"
-          type="toggle"
-          value={napReminderEnabled}
-          onToggle={toggleNapReminder}
-        />
-        <SettingsItem
-          icon="💊"
-          label="Medicine Reminders"
-          type="toggle"
-          value={medicineReminderEnabled}
-          onToggle={toggleMedicineReminder}
-          isLast
-        />
 
         {/* Appearance */}
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>APPEARANCE</Text>

@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, Pressable, View, Image, ImageSourcePropType } from 'react-native';
+import { StyleSheet, Pressable, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { IconComponent } from '@/src/constants/icons';
 
 interface ActivityCardProps {
-  icon: ImageSourcePropType;
+  icon: IconComponent;
   label: string;
   subtitle: string;
   bgColor: string;
@@ -13,7 +14,7 @@ interface ActivityCardProps {
   count?: number | string;
 }
 
-export function ActivityCard({ icon, label, subtitle, bgColor, textColor, onPress, fullWidth, count }: ActivityCardProps) {
+export function ActivityCard({ icon: Icon, label, subtitle, bgColor, textColor, onPress, fullWidth, count }: ActivityCardProps) {
   const badge = count !== undefined && count !== 0 ? (
     <View style={[styles.badge, { backgroundColor: textColor }]}>
       <Text style={styles.badgeText}>{count}</Text>
@@ -26,7 +27,7 @@ export function ActivityCard({ icon, label, subtitle, bgColor, textColor, onPres
         style={[styles.containerFull, { backgroundColor: bgColor }]}
         onPress={onPress}
       >
-        <Image source={icon} style={styles.iconFull} resizeMode="contain" />
+        <Icon width={112} height={112} />
         <View style={styles.fullContent}>
           <Text style={[styles.label, { color: textColor }]}>{label}</Text>
           <Text style={[styles.subtitle, { color: textColor, opacity: 0.7 }]}>{subtitle}</Text>
@@ -42,7 +43,7 @@ export function ActivityCard({ icon, label, subtitle, bgColor, textColor, onPres
       onPress={onPress}
     >
       {badge}
-      <Image source={icon} style={styles.icon} resizeMode="contain" />
+      <Icon width={157} height={157} />
       <Text style={[styles.label, { color: textColor }]}>{label}</Text>
       <Text style={[styles.subtitle, { color: textColor, opacity: 0.7 }]}>{subtitle}</Text>
     </Pressable>
@@ -51,10 +52,10 @@ export function ActivityCard({ icon, label, subtitle, bgColor, textColor, onPres
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 14,
+    padding: 17,
     alignItems: 'center',
-    gap: 10,
+    gap: 7,
     shadowColor: 'rgba(0,0,0,0.05)',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 1,
@@ -62,11 +63,11 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   containerFull: {
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 14,
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 11,
     shadowColor: 'rgba(0,0,0,0.05)',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 1,
@@ -74,20 +75,12 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   fullContent: { flex: 1 },
-  icon: {
-    width: 56,
-    height: 56,
-  },
-  iconFull: {
-    width: 40,
-    height: 40,
-  },
   label: {
-    fontSize: 15,
+    fontSize: 10,
     fontFamily: 'Nunito_700Bold',
   },
   subtitle: {
-    fontSize: 11,
+    fontSize: 8,
   },
   badge: {
     position: 'absolute',

@@ -1,27 +1,19 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Text, StyleSheet, View, Image, ImageSourcePropType } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useAppTheme } from '@/src/theme';
-import { AppIcons } from '@/src/constants/icons';
+import { AppIcons, IconComponent } from '@/src/constants/icons';
 
 interface TabIconProps {
-  icon: string | ImageSourcePropType;
-  label: string;
+  icon: IconComponent;
   focused: boolean;
-  activeColor: string;
-  inactiveColor: string;
+  activeBg: string;
 }
 
-function TabIcon({ icon, label, focused, activeColor, inactiveColor }: TabIconProps) {
-  const color = focused ? activeColor : inactiveColor;
+function TabIcon({ icon: Icon, focused, activeBg }: TabIconProps) {
   return (
-    <View style={styles.tabIcon}>
-      {typeof icon === 'string' ? (
-        <Text style={[styles.emojiIcon, { color }]}>{icon}</Text>
-      ) : (
-        <Image source={icon} style={[styles.imgIcon, { opacity: focused ? 1 : 0.5 }]} resizeMode="contain" />
-      )}
-      <Text style={[styles.label, { color, fontFamily: 'Nunito_600SemiBold' }]}>{label}</Text>
+    <View style={[styles.tabIcon, focused && { backgroundColor: activeBg }]}>
+      <Icon width={108} height={108} style={{ opacity: focused ? 1 : 0.45 }} />
     </View>
   );
 }
@@ -37,9 +29,9 @@ export default function TabLayout() {
           backgroundColor: ollie.navBg,
           borderTopColor: ollie.border,
           borderTopWidth: 1,
-          height: 85,
-          paddingBottom: 28,
-          paddingTop: 10,
+          height: 148,
+          paddingBottom: 26,
+          paddingTop: 8,
         },
         tabBarShowLabel: false,
       }}
@@ -49,39 +41,22 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon
-              icon="🏠"
-              label="Home"
+              icon={AppIcons.home}
               focused={focused}
-              activeColor={ollie.navActive}
-              inactiveColor={ollie.navInactive}
+              activeBg={ollie.bgSecondary}
             />
           ),
         }}
       />
-      <Tabs.Screen
-        name="log"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              icon="➕"
-              label="Log"
-              focused={focused}
-              activeColor={ollie.navActive}
-              inactiveColor={ollie.navInactive}
-            />
-          ),
-        }}
-      />
+      <Tabs.Screen name="log" options={{ href: null }} />
       <Tabs.Screen
         name="timeline"
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon
               icon={AppIcons.log}
-              label="Timeline"
               focused={focused}
-              activeColor={ollie.navActive}
-              inactiveColor={ollie.navInactive}
+              activeBg={ollie.bgSecondary}
             />
           ),
         }}
@@ -91,11 +66,9 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon
-              icon={AppIcons.milestones}
-              label="Insights"
+              icon={AppIcons.insights}
               focused={focused}
-              activeColor={ollie.navActive}
-              inactiveColor={ollie.navInactive}
+              activeBg={ollie.bgSecondary}
             />
           ),
         }}
@@ -106,10 +79,8 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <TabIcon
               icon={AppIcons.more}
-              label="More"
               focused={focused}
-              activeColor={ollie.navActive}
-              inactiveColor={ollie.navInactive}
+              activeBg={ollie.bgSecondary}
             />
           ),
         }}
@@ -124,17 +95,9 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   tabIcon: {
     alignItems: 'center',
-    gap: 4,
-  },
-  emojiIcon: {
-    fontSize: 22,
-    lineHeight: 26,
-  },
-  imgIcon: {
-    width: 26,
-    height: 26,
-  },
-  label: {
-    fontSize: 10,
+    justifyContent: 'center',
+    width: 108,
+    height: 108,
+    borderRadius: 24,
   },
 });

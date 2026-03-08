@@ -24,7 +24,7 @@ interface SettingsState {
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
-  theme: 'pastel',
+  theme: 'monochrome',
   feedReminderEnabled: true,
   napReminderEnabled: true,
   medicineReminderEnabled: false,
@@ -37,7 +37,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     try {
       const all = await settingsRepo.getAllSettings();
       set({
-        theme: (all.theme as ThemeName) || 'pastel',
+        theme: (all.theme as ThemeName) || 'monochrome',
         feedReminderEnabled: all.feed_reminder !== 'false',
         napReminderEnabled: all.nap_reminder !== 'false',
         medicineReminderEnabled: all.medicine_reminder === 'true',

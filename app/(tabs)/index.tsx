@@ -5,27 +5,28 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { SummaryCard } from '@/src/components/SummaryCard';
-import { QuickActionButton } from '@/src/components/QuickActionButton';
+import { ActivityCard } from '@/src/components/ActivityCard';
 import { TimelineItem } from '@/src/components/TimelineItem';
 import { EmptyState } from '@/src/components/EmptyState';
 import { HappinessSlider } from '@/src/components/HappinessSlider';
+import { BabySwitcher } from '@/src/components/BabySwitcher';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { useTodaySummary } from '@/src/hooks/useTodaySummary';
 import { getGreeting, calculateAge, formatTimeAgo, todayDateStr } from '@/src/utils/dateHelpers';
-import { activityMeta } from '@/src/utils/activityHelpers';
+import { activityMeta, getMetaForType } from '@/src/utils/activityHelpers';
 import { formatDuration } from '@/src/utils/dateHelpers';
 import { getDailyPhrase } from '@/src/constants/motivationalPhrases';
 import { ActivityType } from '@/src/types';
 import { AppIcons } from '@/src/constants/icons';
-import { APP_VERSION } from '@/src/constants/version';
 
 export default function HomeScreen() {
   const { ollie } = useAppTheme();
   const router = useRouter();
   const baby = useBabyStore((s) => s.activeBaby);
   const userName = useSettingsStore((s) => s.userName);
+  const customActivityTypes = useSettingsStore((s) => s.customActivityTypes);
   const babyName = baby?.name ?? 'your baby';
   const age = baby?.dateOfBirth ? calculateAge(baby.dateOfBirth) : '';
 
@@ -37,7 +38,21 @@ export default function HomeScreen() {
     }, [refresh])
   );
 
-  const quickActions: ActivityType[] = ['feed', 'sleep', 'pee', 'poop', 'colic', 'tummy_time', 'sun_time'];
+  const getCount = (type: string): number | string => {
+    switch (type) {
+      case 'feed': return summary.feedCount;
+      case 'pee': return summary.peeCount;
+      case 'poop': return summary.poopCount;
+      case 'sleep': return summary.sleepMinutes > 0 ? formatDuration(summary.sleepMinutes * 60) : 0;
+      case 'colic': return summary.colicCount;
+      case 'tummy_time': return summary.tummyTimeMinutes > 0 ? formatDuration(summary.tummyTimeMinutes * 60) : 0;
+      case 'sun_time': return summary.sunTimeMinutes > 0 ? formatDuration(summary.sunTimeMinutes * 60) : 0;
+      default: return 0;
+    }
+  };
+
+  const gridItems: ActivityType[] = ['feed', 'sleep', 'pee', 'poop'];
+  const extraItems: ActivityType[] = ['tummy_time', 'sun_time'];
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: ollie.bg }]} edges={['top']}>
@@ -49,7 +64,7 @@ export default function HomeScreen() {
         <ScreenHeader
           title={`${getGreeting()} ${userName}!`}
           subtitle={`${babyName} is ${age}`}
-          rightElement={<Text style={[styles.versionBadge, { color: ollie.textLight }]}>v{APP_VERSION}</Text>}
+          rightElement={<BabySwitcher compact />}
         />
 
         <Text style={[styles.motivational, { color: ollie.textLight }]}>
@@ -105,30 +120,87 @@ export default function HomeScreen() {
         </View>
 
         {/* Happiness */}
-        <HappinessSlider babyId={baby?.id} date={todayDateStr()} />
+        <HappinessSlider babyId={baby?.id} date={todayDateStr()} babyName={baby?.name} />
 
-        {/* Quick Actions */}
-        <Text style={[styles.sectionTitle, { color: ollie.textPrimary }]}>Quick Log</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.quickActions}
-        >
-          {quickActions.map((type) => {
+        {/* Log Activity */}
+        <Text style={[styles.sectionTitle, { color: ollie.textPrimary }]}>Log Activity</Text>
+        <View style={styles.grid}>
+          {gridItems.map((type) => {
             const meta = activityMeta[type];
-            const c = meta.getColors(ollie);
+            const colors = meta.getColors(ollie);
             return (
-              <QuickActionButton
-                key={type}
-                icon={meta.icon}
-                label={meta.label}
-                bgColor={c.bg}
-                textColor={c.color}
-                onPress={() => router.push(`/log/${type}`)}
-              />
+              <View key={type} style={styles.gridCell}>
+                <ActivityCard
+                  icon={meta.icon}
+                  label={meta.label}
+                  subtitle={meta.subtitle}
+                  bgColor={colors.bg}
+                  textColor={colors.color}
+                  onPress={() => router.push(`/log/${type}`)}
+                  count={getCount(type)}
+                />
+              </View>
             );
           })}
-        </ScrollView>
+        </View>
+
+        {/* Colic full-width */}
+        <ActivityCard
+          icon={activityMeta.colic.icon}
+          label={activityMeta.colic.label}
+          subtitle={activityMeta.colic.subtitle}
+          bgColor={activityMeta.colic.getColors(ollie).bg}
+          textColor={activityMeta.colic.getColors(ollie).color}
+          onPress={() => router.push('/log/colic')}
+          fullWidth
+          count={getCount('colic')}
+        />
+
+        {/* Tummy Time & Sun Time */}
+        <View style={styles.extraGrid}>
+          {extraItems.map((type) => {
+            const meta = activityMeta[type];
+            const colors = meta.getColors(ollie);
+            return (
+              <View key={type} style={styles.gridCell}>
+                <ActivityCard
+                  icon={meta.icon}
+                  label={meta.label}
+                  subtitle={meta.subtitle}
+                  bgColor={colors.bg}
+                  textColor={colors.color}
+                  onPress={() => router.push(`/log/${type}`)}
+                  count={getCount(type)}
+                />
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Custom Activity Types */}
+        {customActivityTypes.length > 0 && (
+          <>
+            <Text style={[styles.customTitle, { color: ollie.textLight }]}>CUSTOM</Text>
+            <View style={styles.grid}>
+              {customActivityTypes.map((type) => {
+                const meta = getMetaForType(type);
+                const colors = meta.getColors(ollie);
+                return (
+                  <View key={type} style={styles.gridCell}>
+                    <ActivityCard
+                      icon={meta.icon}
+                      label={meta.label}
+                      subtitle={meta.subtitle}
+                      bgColor={colors.bg}
+                      textColor={colors.color}
+                      onPress={() => router.push(`/log/${type}`)}
+                    />
+                  </View>
+                );
+              })}
+            </View>
+          </>
+        )}
 
         {/* Last Activity */}
         <Text style={[styles.sectionTitle, { color: ollie.textPrimary, marginTop: 24 }]}>
@@ -145,7 +217,7 @@ export default function HomeScreen() {
           <EmptyState
             icon="🌟"
             title="No activities yet today"
-            subtitle="Tap Quick Log above to start tracking"
+            subtitle="Tap an activity above to start tracking"
           />
         )}
       </ScrollView>
@@ -172,17 +244,33 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_700Bold',
     marginBottom: 12,
   },
-  quickActions: {
-    gap: 10,
-    paddingRight: 20,
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 14,
+    marginBottom: 14,
+  },
+  extraGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 14,
+    marginTop: 14,
+    marginBottom: 14,
+  },
+  gridCell: {
+    width: '47%',
+    flexGrow: 1,
+  },
+  customTitle: {
+    fontSize: 12,
+    fontFamily: 'Nunito_700Bold',
+    letterSpacing: 1,
+    marginBottom: 10,
+    marginTop: 6,
   },
   timeAgo: {
     fontSize: 12,
     textAlign: 'center',
     marginTop: 4,
-  },
-  versionBadge: {
-    fontSize: 12,
-    fontFamily: 'Nunito_600SemiBold',
   },
 });

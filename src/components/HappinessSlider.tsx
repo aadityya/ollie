@@ -3,21 +3,23 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useAppTheme } from '@/src/theme';
 import * as happinessRepo from '@/src/db/repositories/happinessRepository';
+import { MoodIcons } from '@/src/constants/icons';
 
 const SCALE = [
-  { score: 1, emoji: '😢', label: 'Tough' },
-  { score: 2, emoji: '😟', label: 'Hard' },
-  { score: 3, emoji: '😐', label: 'Okay' },
-  { score: 4, emoji: '🙂', label: 'Good' },
-  { score: 5, emoji: '😄', label: 'Great' },
+  { score: 1, label: 'Tough' },
+  { score: 2, label: 'Hard' },
+  { score: 3, label: 'Okay' },
+  { score: 4, label: 'Good' },
+  { score: 5, label: 'Great' },
 ];
 
 interface HappinessSliderProps {
   babyId: string | undefined;
   date: string;
+  babyName?: string;
 }
 
-export function HappinessSlider({ babyId, date }: HappinessSliderProps) {
+export function HappinessSlider({ babyId, date, babyName }: HappinessSliderProps) {
   const { ollie } = useAppTheme();
   const [selected, setSelected] = useState<number | null>(null);
 
@@ -40,10 +42,11 @@ export function HappinessSlider({ babyId, date }: HappinessSliderProps) {
 
   return (
     <View style={[styles.container, { backgroundColor: ollie.bgCard, borderRadius: ollie.radius }]}>
-      <Text style={[styles.title, { color: ollie.textPrimary }]}>How's your day?</Text>
+      <Text style={[styles.title, { color: ollie.textPrimary }]}>How's {babyName ? `${babyName}'s` : 'your'} day?</Text>
       <View style={styles.row}>
         {SCALE.map((item) => {
           const isSelected = selected === item.score;
+          const MoodIcon = MoodIcons[item.score - 1];
           return (
             <Pressable
               key={item.score}
@@ -53,7 +56,9 @@ export function HappinessSlider({ babyId, date }: HappinessSliderProps) {
               ]}
               onPress={() => handleSelect(item.score)}
             >
-              <Text style={[styles.emoji, !isSelected && styles.dimmed]}>{item.emoji}</Text>
+              <View style={[styles.moodIcon, !isSelected && styles.dimmed]}>
+                <MoodIcon width={36} height={36} />
+              </View>
               <Text style={[styles.label, { color: isSelected ? ollie.accent : ollie.textLight }]}>
                 {item.label}
               </Text>
@@ -84,8 +89,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 10,
   },
-  emoji: {
-    fontSize: 28,
+  moodIcon: {
     marginBottom: 4,
   },
   dimmed: {

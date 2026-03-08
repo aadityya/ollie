@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, Pressable, Image, ImageSourcePropType } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { Text, Switch } from 'react-native-paper';
 import { useAppTheme } from '@/src/theme';
+import { IconComponent } from '@/src/constants/icons';
 
 interface SettingsItemProps {
-  icon: string | ImageSourcePropType;
+  icon: string | IconComponent;
   label: string;
   type?: 'arrow' | 'toggle';
   value?: boolean;
@@ -36,6 +37,18 @@ export function SettingsItem({
         ? { borderBottomLeftRadius: ollie.radiusSm, borderBottomRightRadius: ollie.radiusSm }
         : {};
 
+  const renderIcon = () => {
+    if (typeof icon === 'string') {
+      return <Text style={styles.iconEmoji}>{icon}</Text>;
+    }
+    const Icon = icon;
+    return (
+      <View style={styles.iconContainer}>
+        <Icon width={28} height={28} />
+      </View>
+    );
+  };
+
   return (
     <Pressable
       onPress={type === 'arrow' ? onPress : undefined}
@@ -45,11 +58,7 @@ export function SettingsItem({
         borderRadiusStyle,
       ]}
     >
-      {typeof icon === 'string' ? (
-        <Text style={styles.iconEmoji}>{icon}</Text>
-      ) : (
-        <Image source={icon} style={styles.iconImg} resizeMode="contain" />
-      )}
+      {renderIcon()}
       <Text
         style={[styles.label, { color: ollie.textPrimary, fontFamily: 'Nunito_600SemiBold' }]}
       >
@@ -81,9 +90,11 @@ const styles = StyleSheet.create({
   iconEmoji: {
     fontSize: 22,
   },
-  iconImg: {
+  iconContainer: {
     width: 28,
     height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   label: {
     flex: 1,

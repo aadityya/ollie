@@ -1,9 +1,8 @@
-import { ImageSourcePropType } from 'react-native';
 import { ActivityType, OlliePalette, ActivityColorSet } from '@/src/types';
-import { AppIcons } from '@/src/constants/icons';
+import { AppIcons, IconComponent } from '@/src/constants/icons';
 
 interface ActivityMeta {
-  icon: ImageSourcePropType;
+  icon: IconComponent;
   label: string;
   subtitle: string;
   getColors: (palette: OlliePalette) => ActivityColorSet;

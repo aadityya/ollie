@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Image, StyleSheet, ImageSourcePropType } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
+import { IconComponent } from '@/src/constants/icons';
 
 interface SummaryCardProps {
-  icon: ImageSourcePropType;
+  icon: IconComponent;
   value: string;
   label: string;
   subtitle: string;
@@ -11,10 +12,10 @@ interface SummaryCardProps {
   textColor: string;
 }
 
-export function SummaryCard({ icon, value, label, subtitle, backgroundColor, textColor }: SummaryCardProps) {
+export function SummaryCard({ icon: Icon, value, label, subtitle, backgroundColor, textColor }: SummaryCardProps) {
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Image source={icon} style={styles.icon} resizeMode="contain" />
+      <Icon width={108} height={108} />
       <Text style={[styles.value, { color: '#000' }]}>{value}</Text>
       <Text style={[styles.label, { color: textColor }]}>{label}</Text>
       <Text style={[styles.subtitle, { color: textColor, opacity: 0.7 }]}>{subtitle}</Text>
@@ -24,23 +25,20 @@ export function SummaryCard({ icon, value, label, subtitle, backgroundColor, tex
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 20,
-    padding: 14,
-    gap: 4,
-  },
-  icon: {
-    width: 32,
-    height: 32,
+    borderRadius: 15,
+    padding: 8,
+    gap: 2,
+    alignItems: 'center',
   },
   value: {
-    fontSize: 22,
+    fontSize: 15,
     fontFamily: 'Nunito_800ExtraBold',
   },
   label: {
-    fontSize: 12,
+    fontSize: 9,
     fontFamily: 'Nunito_600SemiBold',
   },
   subtitle: {
-    fontSize: 11,
+    fontSize: 8,
   },
 });

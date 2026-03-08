@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { SettingsItem } from '@/src/components/SettingsItem';
+import { BabySwitcher } from '@/src/components/BabySwitcher';
 import { useAppTheme } from '@/src/theme';
 import { AppIcons } from '@/src/constants/icons';
 
@@ -19,24 +20,29 @@ export default function MoreScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <ScreenHeader title="More" />
+        <ScreenHeader title="More" rightElement={<BabySwitcher compact />} />
 
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>TRACKING</Text>
         <SettingsItem
-          icon="📏"
+          icon={AppIcons.measurements}
           label="Measurements"
           onPress={() => router.push('/measurements')}
           isFirst
         />
         <SettingsItem
-          icon="📅"
+          icon={AppIcons.appointments}
           label="Appointments"
           onPress={() => router.push('/appointments')}
         />
         <SettingsItem
-          icon="💝"
+          icon={AppIcons.memories}
           label="Memories"
           onPress={() => router.push('/memories')}
+        />
+        <SettingsItem
+          icon={AppIcons.medications}
+          label="Medications"
+          onPress={() => router.push('/log/medication')}
           isLast
         />
 

@@ -1,22 +1,23 @@
 import React from 'react';
-import { StyleSheet, Pressable, Image, ImageSourcePropType } from 'react-native';
+import { StyleSheet, Pressable } from 'react-native';
 import { Text } from 'react-native-paper';
+import { IconComponent } from '@/src/constants/icons';
 
 interface QuickActionButtonProps {
-  icon: ImageSourcePropType;
+  icon: IconComponent;
   label: string;
   bgColor: string;
   textColor: string;
   onPress: () => void;
 }
 
-export function QuickActionButton({ icon, label, bgColor, textColor, onPress }: QuickActionButtonProps) {
+export function QuickActionButton({ icon: Icon, label, bgColor, textColor, onPress }: QuickActionButtonProps) {
   return (
     <Pressable
       style={[styles.container, { backgroundColor: bgColor }]}
       onPress={onPress}
     >
-      <Image source={icon} style={styles.icon} resizeMode="contain" />
+      <Icon width={48} height={48} />
       <Text style={[styles.label, { color: textColor }]}>{label}</Text>
     </Pressable>
   );
@@ -30,10 +31,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 8,
     borderRadius: 14,
-  },
-  icon: {
-    width: 36,
-    height: 36,
   },
   label: {
     fontSize: 11,

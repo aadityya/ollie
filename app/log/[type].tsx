@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Pressable, TextInput, Alert, Image } from 'react-native';
+import { View, ScrollView, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -29,10 +29,30 @@ const titles: Record<string, string> = {
   colic: 'Log Colic Episode',
   tummy_time: 'Log Tummy Time',
   sun_time: 'Log Sun Time',
+  medication: 'Log Medication',
 };
 
 const timerTypes = ['feed', 'sleep', 'colic', 'tummy_time', 'sun_time'];
-const hasTimer = (type: string) => timerTypes.includes(type);
+const hasTimerFn = (type: string) => timerTypes.includes(type);
+
+function todayStr(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatTimeHHMM(h: number, m: number): string {
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function nowTimeStr(): string {
+  const now = new Date();
+  return formatTimeHHMM(now.getHours(), now.getMinutes());
+}
+
+function oneHourAgoTimeStr(): string {
+  const now = new Date();
+  now.setHours(now.getHours() - 1);
+  return formatTimeHHMM(now.getHours(), now.getMinutes());
+}
 
 export default function ActivityFormScreen() {
   const { type } = useLocalSearchParams<{ type: string }>();
@@ -44,10 +64,20 @@ export default function ActivityFormScreen() {
   const activityType = type ?? 'feed';
   const meta = getMetaForType(activityType);
   const colors = meta.getColors(ollie);
+  const isTimedActivity = hasTimerFn(activityType);
 
   const timer = useTimer();
   const [saving, setSaving] = useState(false);
   const [notes, setNotes] = useState('');
+
+  // Date picker state
+  const [activityDate, setActivityDate] = useState(todayStr);
+  const [showDateInput, setShowDateInput] = useState(false);
+
+  // Manual time entry state (for timed activities)
+  const [timeMode, setTimeMode] = useState<'timer' | 'manual'>('timer');
+  const [manualStartTime, setManualStartTime] = useState(oneHourAgoTimeStr);
+  const [manualEndTime, setManualEndTime] = useState(nowTimeStr);
 
   // Feed state
   const [feedType, setFeedType] = useState<FeedType>('breast_left');
@@ -69,24 +99,58 @@ export default function ActivityFormScreen() {
 
   const handleSave = async () => {
     if (!babyId) return;
-    if (hasTimer(activityType) && timer.isRunning) {
+    if (isTimedActivity && timeMode === 'timer' && timer.isRunning) {
       timer.stop();
     }
     setSaving(true);
 
-    const now = new Date().toISOString();
-    const durationSeconds = hasTimer(activityType) ? timer.elapsed : undefined;
-    const startedAt = durationSeconds
-      ? new Date(Date.now() - durationSeconds * 1000).toISOString()
-      : now;
+    let startedAt: string;
+    let endedAt: string;
+    let durationSeconds: number | undefined;
+    const today = todayStr();
+
+    if (isTimedActivity && timeMode === 'manual') {
+      const [sh, sm] = manualStartTime.split(':').map(Number);
+      const [eh, em] = manualEndTime.split(':').map(Number);
+      const startDate = new Date(activityDate + 'T00:00:00');
+      startDate.setHours(sh, sm, 0, 0);
+      const endDate = new Date(activityDate + 'T00:00:00');
+      endDate.setHours(eh, em, 0, 0);
+      if (endDate <= startDate) {
+        Alert.alert('Invalid Time', 'End time must be after start time.');
+        setSaving(false);
+        return;
+      }
+      startedAt = startDate.toISOString();
+      endedAt = endDate.toISOString();
+      durationSeconds = Math.round((endDate.getTime() - startDate.getTime()) / 1000);
+    } else if (isTimedActivity && timeMode === 'timer') {
+      const elapsed = timer.elapsed;
+      if (activityDate === today) {
+        endedAt = new Date().toISOString();
+        startedAt = new Date(Date.now() - elapsed * 1000).toISOString();
+      } else {
+        const baseDate = new Date(activityDate + 'T12:00:00');
+        startedAt = new Date(baseDate.getTime() - elapsed * 1000).toISOString();
+        endedAt = baseDate.toISOString();
+      }
+      durationSeconds = elapsed || undefined;
+    } else {
+      if (activityDate === today) {
+        startedAt = new Date().toISOString();
+      } else {
+        startedAt = new Date(activityDate + 'T12:00:00').toISOString();
+      }
+      endedAt = startedAt;
+    }
 
     try {
       await saveActivity({
         babyId,
         type: activityType as ActivityType,
         startedAt,
-        endedAt: now,
-        durationSeconds: durationSeconds || undefined,
+        endedAt,
+        durationSeconds,
         feedType: activityType === 'feed' ? feedType : undefined,
         bottleAmountMl:
           activityType === 'feed' && feedType === 'bottle' && bottleAmount
@@ -233,6 +297,8 @@ export default function ActivityFormScreen() {
     }
   };
 
+  const isToday = activityDate === todayStr();
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: ollie.bg }]}>
       <ScrollView
@@ -246,13 +312,60 @@ export default function ActivityFormScreen() {
         </Pressable>
 
         <View style={[styles.header, { backgroundColor: colors.bg }]}>
-          {meta?.icon && <Image source={meta.icon} style={styles.headerIcon} resizeMode="contain" />}
+          {meta?.icon && (() => { const Icon = meta.icon; return <Icon width={160} height={160} />; })()}
           <Text style={[styles.headerTitle, { color: colors.color }]}>
             {titles[activityType] ?? `Log ${activityType}`}
           </Text>
         </View>
 
-        {hasTimer(activityType) && (
+        {/* Date Picker */}
+        <View style={styles.section}>
+          <Text style={[styles.fieldLabel, { color: ollie.textSecondary }]}>Date</Text>
+          <View style={styles.dateRow}>
+            <Pressable
+              style={[styles.dateChip, { backgroundColor: isToday && !showDateInput ? colors.bg : ollie.bgSecondary, borderRadius: ollie.radiusSm }]}
+              onPress={() => { setActivityDate(todayStr()); setShowDateInput(false); }}
+            >
+              <Text style={[styles.dateChipText, { color: isToday && !showDateInput ? colors.color : ollie.textSecondary }]}>Today</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.dateChip, { backgroundColor: showDateInput ? colors.bg : ollie.bgSecondary, borderRadius: ollie.radiusSm }]}
+              onPress={() => setShowDateInput(true)}
+            >
+              <Text style={[styles.dateChipText, { color: showDateInput ? colors.color : ollie.textSecondary }]}>
+                {showDateInput && activityDate !== todayStr() ? activityDate : 'Other Date'}
+              </Text>
+            </Pressable>
+          </View>
+          {showDateInput && (
+            <TextInput
+              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bgCard, marginTop: 10 }]}
+              value={activityDate}
+              onChangeText={setActivityDate}
+              placeholder="YYYY-MM-DD"
+              placeholderTextColor={ollie.textLight}
+              keyboardType="numbers-and-punctuation"
+            />
+          )}
+        </View>
+
+        {/* Timer vs Manual mode toggle for timed activities */}
+        {isTimedActivity && (
+          <View style={styles.section}>
+            <SegmentedControl
+              options={[
+                { value: 'timer', label: 'Timer' },
+                { value: 'manual', label: 'Start / Stop Time' },
+              ]}
+              selectedValue={timeMode}
+              onChange={(v) => setTimeMode(v as 'timer' | 'manual')}
+              activeColor={colors.bg}
+              activeTextColor={colors.color}
+            />
+          </View>
+        )}
+
+        {isTimedActivity && timeMode === 'timer' && (
           <Timer
             elapsed={timer.elapsed}
             isRunning={timer.isRunning}
@@ -261,6 +374,37 @@ export default function ActivityFormScreen() {
             onReset={timer.reset}
             accentColor={colors.color}
           />
+        )}
+
+        {isTimedActivity && timeMode === 'manual' && (
+          <View style={styles.section}>
+            <Text style={[styles.fieldLabel, { color: ollie.textSecondary }]}>Start & End Time</Text>
+            <View style={styles.timeRow}>
+              <View style={styles.timeField}>
+                <Text style={[styles.timeLabel, { color: ollie.textLight }]}>Start</Text>
+                <TextInput
+                  style={[styles.input, styles.timeInput, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bgCard }]}
+                  value={manualStartTime}
+                  onChangeText={setManualStartTime}
+                  placeholder="HH:MM"
+                  placeholderTextColor={ollie.textLight}
+                  keyboardType="numbers-and-punctuation"
+                />
+              </View>
+              <Text style={[styles.timeSeparator, { color: ollie.textLight }]}>to</Text>
+              <View style={styles.timeField}>
+                <Text style={[styles.timeLabel, { color: ollie.textLight }]}>End</Text>
+                <TextInput
+                  style={[styles.input, styles.timeInput, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bgCard }]}
+                  value={manualEndTime}
+                  onChangeText={setManualEndTime}
+                  placeholder="HH:MM"
+                  placeholderTextColor={ollie.textLight}
+                  keyboardType="numbers-and-punctuation"
+                />
+              </View>
+            </View>
+          </View>
         )}
 
         {renderForm()}
@@ -305,7 +449,6 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  headerIcon: { width: 56, height: 56 },
   headerTitle: { fontSize: 20, fontFamily: 'Nunito_800ExtraBold' },
   section: { marginTop: 20 },
   fieldLabel: {
@@ -325,6 +468,40 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 80,
     textAlignVertical: 'top',
+  },
+  dateRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  dateChip: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  dateChipText: {
+    fontSize: 13,
+    fontFamily: 'Nunito_700Bold',
+  },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  timeField: {
+    flex: 1,
+  },
+  timeLabel: {
+    fontSize: 11,
+    fontFamily: 'Nunito_600SemiBold',
+    marginBottom: 4,
+  },
+  timeInput: {
+    textAlign: 'center',
+  },
+  timeSeparator: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
+    marginTop: 16,
   },
   saveBtn: {
     marginTop: 28,

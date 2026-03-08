@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, StyleSheet, Pressable, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useAppTheme } from '@/src/theme';
 import { Activity } from '@/src/types';
@@ -15,6 +15,7 @@ export function TimelineItem({ activity, onDelete }: TimelineItemProps) {
   const { ollie } = useAppTheme();
   const meta = getMetaForType(activity.type);
   const colors = meta.getColors(ollie);
+  const Icon = meta.icon;
 
   const handleDelete = () => {
     Alert.alert('Delete Activity', 'Are you sure you want to delete this entry?', [
@@ -26,7 +27,7 @@ export function TimelineItem({ activity, onDelete }: TimelineItemProps) {
   return (
     <View style={[styles.container, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm, shadowColor: ollie.shadow }]}>
       <View style={[styles.icon, { backgroundColor: colors.bg, borderRadius: 12 }]}>
-        <Image source={meta.icon} style={styles.iconImg} resizeMode="contain" />
+        <Icon width={40} height={40} />
       </View>
       <View style={styles.info}>
         <Text style={[styles.title, { color: ollie.textPrimary }]}>
@@ -61,14 +62,10 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   icon: {
-    width: 42,
-    height: 42,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  iconImg: {
-    width: 28,
-    height: 28,
   },
   info: {
     flex: 1,

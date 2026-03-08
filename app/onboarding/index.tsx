@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable, TextInput, KeyboardAvoidingView, Platform, Image, ScrollView } from 'react-native';
+import { View, StyleSheet, Pressable, TextInput, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
-import { WelcomeBg } from '@/src/constants/icons';
+import { WelcomeScreenLogo } from '@/src/constants/icons';
 import { generateMockData } from '@/src/utils/mockData';
 
 interface BabyEntry {
@@ -88,7 +88,9 @@ export default function OnboardingScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Image source={WelcomeBg} style={styles.heroImage} resizeMode="contain" />
+          <View style={styles.heroImage}>
+            <WelcomeScreenLogo width={220} height={220} />
+          </View>
           <Text style={[styles.title, { color: ollie.textPrimary }]}>
             Welcome to Ollie
           </Text>
@@ -193,9 +195,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   heroImage: {
-    width: '100%',
-    height: 220,
-    alignSelf: 'center',
+    alignItems: 'center',
     marginBottom: 12,
   },
   title: {

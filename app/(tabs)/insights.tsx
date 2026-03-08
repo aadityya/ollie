@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { BarChart } from 'react-native-gifted-charts';
 import { ScreenHeader } from '@/src/components/ScreenHeader';
+import { BabySwitcher } from '@/src/components/BabySwitcher';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useInsightsData, InsightRange } from '@/src/hooks/useInsightsData';
@@ -89,7 +90,7 @@ export default function InsightsScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <ScreenHeader title="Insights" subtitle={baby?.name ? `${baby.name}'s trends` : 'Activity trends'} />
+        <ScreenHeader title="Insights" subtitle={baby?.name ? `${baby.name}'s trends` : 'Activity trends'} rightElement={<BabySwitcher compact />} />
 
         {/* Range Selector */}
         <View style={styles.rangeRow}>
