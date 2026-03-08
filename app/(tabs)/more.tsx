@@ -45,7 +45,7 @@ export default function MoreScreen() {
         <SettingsItem
           icon={AppIcons.medications}
           label="Medications"
-          onPress={() => router.push('/log/medication')}
+          onPress={() => router.push('/medications')}
           isLast
         />
 

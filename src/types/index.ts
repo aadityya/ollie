@@ -93,6 +93,18 @@ export interface Memory {
   createdAt: string;
 }
 
+export interface Medication {
+  id: string;
+  babyId: string;
+  name: string;
+  dosage?: string;
+  frequency?: string;
+  startDate: string;
+  endDate?: string;
+  notes?: string;
+  createdAt: string;
+}
+
 export interface HappinessRecord {
   id: string;
   babyId: string;

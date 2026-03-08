@@ -6,122 +6,122 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { DateField } from '@/src/components/DateField';
-import { TimeField } from '@/src/components/TimeField';
-import { Appointment } from '@/src/types';
-import * as appointmentRepo from '@/src/db/repositories/appointmentRepository';
+import { Medication } from '@/src/types';
+import * as medicationRepo from '@/src/db/repositories/medicationRepository';
 
-export default function AppointmentsScreen() {
+export default function MedicationsScreen() {
   const { ollie } = useAppTheme();
   const router = useRouter();
   const baby = useBabyStore((s) => s.activeBaby);
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [medications, setMedications] = useState<Medication[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [location, setLocation] = useState('');
+  const [name, setName] = useState('');
+  const [dosage, setDosage] = useState('');
+  const [frequency, setFrequency] = useState('');
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState('');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
 
   const loadData = useCallback(async () => {
     if (!baby?.id) return;
-    const data = await appointmentRepo.getAppointments(baby.id);
-    setAppointments(data);
+    const data = await medicationRepo.getMedications(baby.id);
+    setMedications(data);
   }, [baby?.id]);
 
   useFocusEffect(useCallback(() => { loadData(); }, [loadData]));
 
-  const now = new Date().toISOString();
-  const upcoming = appointments.filter((a) => a.dateTime >= now);
-  const past = appointments.filter((a) => a.dateTime < now);
-
   const resetForm = () => {
-    setTitle(''); setDate(''); setTime(''); setLocation(''); setNotes('');
+    setName(''); setDosage(''); setFrequency('');
+    setStartDate(new Date().toISOString().split('T')[0]);
+    setEndDate(''); setNotes('');
     setEditingId(null);
     setShowForm(false);
   };
 
-  const startEdit = (apt: Appointment) => {
-    setEditingId(apt.id);
-    const d = new Date(apt.dateTime);
-    setTitle(apt.title);
-    setDate(apt.dateTime.split('T')[0]);
-    setTime(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`);
-    setLocation(apt.location ?? '');
-    setNotes(apt.notes ?? '');
+  const startEdit = (med: Medication) => {
+    setEditingId(med.id);
+    setName(med.name);
+    setDosage(med.dosage ?? '');
+    setFrequency(med.frequency ?? '');
+    setStartDate(med.startDate);
+    setEndDate(med.endDate ?? '');
+    setNotes(med.notes ?? '');
     setShowForm(true);
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300);
   };
 
   const handleSave = async () => {
-    if (!baby?.id || !title.trim() || !date.trim()) return;
+    if (!baby?.id || !name.trim() || !startDate.trim()) return;
     setSaving(true);
     try {
-      const dateTime = time.trim()
-        ? `${date.trim()}T${time.trim()}:00`
-        : `${date.trim()}T09:00:00`;
       const data = {
-        title: title.trim(),
-        dateTime,
-        location: location.trim() || undefined,
+        name: name.trim(),
+        dosage: dosage.trim() || undefined,
+        frequency: frequency.trim() || undefined,
+        startDate: startDate.trim(),
+        endDate: endDate.trim() || undefined,
         notes: notes.trim() || undefined,
       };
       if (editingId) {
-        await appointmentRepo.updateAppointment(editingId, data);
+        await medicationRepo.updateMedication(editingId, data);
       } else {
-        await appointmentRepo.insertAppointment({ babyId: baby.id, ...data });
+        await medicationRepo.insertMedication({ babyId: baby.id, ...data });
       }
       resetForm();
       await loadData();
     } catch (e) {
-      Alert.alert('Error', 'Failed to save appointment.');
+      Alert.alert('Error', 'Failed to save medication.');
     }
     setSaving(false);
   };
 
-  const handleDelete = (apt: Appointment) => {
-    Alert.alert('Delete Appointment', `Delete "${apt.title}"?`, [
+  const handleDelete = (med: Medication) => {
+    Alert.alert('Delete Medication', `Delete "${med.name}"?`, [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete', style: 'destructive', onPress: async () => {
-          await appointmentRepo.deleteAppointment(apt.id);
-          if (editingId === apt.id) resetForm();
+          await medicationRepo.deleteMedication(med.id);
+          if (editingId === med.id) resetForm();
           await loadData();
         },
       },
     ]);
   };
 
-  const renderCard = (apt: Appointment) => {
-    const d = new Date(apt.dateTime);
-    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-    return (
-      <View
-        key={apt.id}
-        style={[styles.card, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}
-      >
-        <Text style={[styles.cardTitle, { color: ollie.textPrimary }]}>{apt.title}</Text>
-        <Text style={[styles.cardDate, { color: ollie.accent }]}>{dateStr} at {timeStr}</Text>
-        {apt.location && (
-          <Text style={[styles.cardDetail, { color: ollie.textSecondary }]}>📍 {apt.location}</Text>
-        )}
-        {apt.notes && (
-          <Text style={[styles.cardDetail, { color: ollie.textLight }]}>{apt.notes}</Text>
-        )}
-        <View style={styles.cardActions}>
-          <Pressable onPress={() => startEdit(apt)}>
-            <Text style={[styles.actionText, { color: ollie.accent }]}>Edit</Text>
-          </Pressable>
-          <Pressable onPress={() => handleDelete(apt)}>
-            <Text style={[styles.actionText, { color: ollie.textLight }]}>Delete</Text>
-          </Pressable>
-        </View>
+  const active = medications.filter((m) => !m.endDate);
+  const ended = medications.filter((m) => !!m.endDate);
+
+  const renderCard = (med: Medication) => (
+    <View
+      key={med.id}
+      style={[styles.card, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}
+    >
+      <Text style={[styles.cardTitle, { color: ollie.textPrimary }]}>{med.name}</Text>
+      {med.dosage && (
+        <Text style={[styles.cardDetail, { color: ollie.textSecondary }]}>Dosage: {med.dosage}</Text>
+      )}
+      {med.frequency && (
+        <Text style={[styles.cardDetail, { color: ollie.textSecondary }]}>Frequency: {med.frequency}</Text>
+      )}
+      <Text style={[styles.cardDate, { color: ollie.accent }]}>
+        Started: {med.startDate}{med.endDate ? ` — Ended: ${med.endDate}` : ''}
+      </Text>
+      {med.notes && (
+        <Text style={[styles.cardDetail, { color: ollie.textLight }]}>{med.notes}</Text>
+      )}
+      <View style={styles.cardActions}>
+        <Pressable onPress={() => startEdit(med)}>
+          <Text style={[styles.actionText, { color: ollie.accent }]}>Edit</Text>
+        </Pressable>
+        <Pressable onPress={() => handleDelete(med)}>
+          <Text style={[styles.actionText, { color: ollie.textLight }]}>Delete</Text>
+        </Pressable>
       </View>
-    );
-  };
+    </View>
+  );
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: ollie.bg }]}>
@@ -141,51 +141,56 @@ export default function AppointmentsScreen() {
         </Pressable>
 
         <Text style={[styles.title, { color: ollie.textPrimary }]}>
-          {baby?.name ? `${baby.name}'s Appointments` : 'Appointments'}
+          {baby?.name ? `${baby.name}'s Medications` : 'Medications'}
         </Text>
 
-        {upcoming.length > 0 && (
+        {active.length > 0 && (
           <>
-            <Text style={[styles.sectionTitle, { color: ollie.textLight }]}>UPCOMING</Text>
-            {upcoming.map(renderCard)}
+            <Text style={[styles.sectionTitle, { color: ollie.textLight }]}>ACTIVE</Text>
+            {active.map(renderCard)}
           </>
         )}
 
-        {past.length > 0 && (
+        {ended.length > 0 && (
           <>
-            <Text style={[styles.sectionTitle, { color: ollie.textLight }]}>PAST</Text>
-            {past.map(renderCard)}
+            <Text style={[styles.sectionTitle, { color: ollie.textLight }]}>ENDED</Text>
+            {ended.map(renderCard)}
           </>
         )}
 
-        {appointments.length === 0 && !showForm && (
+        {medications.length === 0 && !showForm && (
           <View style={styles.empty}>
-            <Text style={[styles.emptyIcon]}>📅</Text>
-            <Text style={[styles.emptyText, { color: ollie.textLight }]}>No appointments yet</Text>
+            <Text style={styles.emptyIcon}>💊</Text>
+            <Text style={[styles.emptyText, { color: ollie.textLight }]}>No medications yet</Text>
           </View>
         )}
 
         {showForm && (
           <View style={[styles.form, { backgroundColor: ollie.bgCard, borderRadius: ollie.radius }]}>
             <Text style={[styles.formTitle, { color: ollie.textPrimary }]}>
-              {editingId ? 'Edit Appointment' : 'New Appointment'}
+              {editingId ? 'Edit Medication' : 'New Medication'}
             </Text>
             <TextInput
               style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
-              value={title} onChangeText={setTitle} placeholder="Title" placeholderTextColor={ollie.textLight}
+              value={name} onChangeText={setName} placeholder="Medication name" placeholderTextColor={ollie.textLight}
               onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
             />
-            <View style={{ marginBottom: 10 }}>
-              <DateField value={date} onChange={setDate} />
-            </View>
-            <View style={{ marginBottom: 10 }}>
-              <TimeField value={time} onChange={setTime} label="Time (optional)" />
-            </View>
             <TextInput
               style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
-              value={location} onChangeText={setLocation} placeholder="Location (optional)" placeholderTextColor={ollie.textLight}
+              value={dosage} onChangeText={setDosage} placeholder="Dosage (optional)" placeholderTextColor={ollie.textLight}
               onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
             />
+            <TextInput
+              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
+              value={frequency} onChangeText={setFrequency} placeholder="Frequency (optional)" placeholderTextColor={ollie.textLight}
+              onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
+            />
+            <View style={{ marginBottom: 10 }}>
+              <DateField value={startDate} onChange={setStartDate} />
+            </View>
+            <View style={{ marginBottom: 10 }}>
+              <DateField value={endDate} onChange={setEndDate} label="End Date (optional)" />
+            </View>
             <TextInput
               style={[styles.input, styles.textArea, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
               value={notes} onChangeText={setNotes} placeholder="Notes (optional)" placeholderTextColor={ollie.textLight}
@@ -199,7 +204,7 @@ export default function AppointmentsScreen() {
               <Pressable
                 style={[styles.saveBtn, { backgroundColor: ollie.accent }]}
                 onPress={handleSave}
-                disabled={saving || !title.trim() || !date.trim()}
+                disabled={saving || !name.trim() || !startDate.trim()}
               >
                 <Text style={styles.saveBtnText}>{saving ? 'Saving...' : 'Save'}</Text>
               </Pressable>
@@ -212,7 +217,7 @@ export default function AppointmentsScreen() {
             style={[styles.addBtn, { borderColor: ollie.accent }]}
             onPress={() => { setEditingId(null); setShowForm(true); setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300); }}
           >
-            <Text style={[styles.addBtnText, { color: ollie.accent }]}>+ Add Appointment</Text>
+            <Text style={[styles.addBtnText, { color: ollie.accent }]}>+ Add Medication</Text>
           </Pressable>
         )}
       </ScrollView>

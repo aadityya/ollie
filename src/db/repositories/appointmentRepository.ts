@@ -48,6 +48,17 @@ export async function insertAppointment(
   return { ...data, id, createdAt: now };
 }
 
+export async function updateAppointment(
+  id: string,
+  data: { title: string; dateTime: string; location?: string; notes?: string }
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    'UPDATE appointments SET title = ?, date_time = ?, location = ?, notes = ? WHERE id = ?',
+    [data.title, data.dateTime, data.location ?? null, data.notes ?? null, id]
+  );
+}
+
 export async function deleteAppointment(id: string): Promise<void> {
   const db = await getDatabase();
   await db.runAsync('DELETE FROM appointments WHERE id = ?', [id]);

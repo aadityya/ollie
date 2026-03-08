@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet, Alert, TextInput, Pressable } from 'react-native';
+import { ScrollView, View, StyleSheet, Alert, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -74,6 +74,10 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: ollie.bg }]} edges={['top']}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
       <ScrollView
         style={[styles.container, { backgroundColor: ollie.bg }]}
         contentContainerStyle={styles.content}
@@ -216,12 +220,14 @@ export default function SettingsScreen() {
           <Text style={[styles.appVersion, { color: ollie.textLight }]}>Version {APP_VERSION}</Text>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
+  flex: { flex: 1 },
   container: { flex: 1 },
   content: { padding: 20, paddingTop: 16, paddingBottom: 40 },
   badgeWrap: { marginTop: 4, marginBottom: 16 },

@@ -72,6 +72,10 @@ function AppContent() {
           name="memories/index"
           options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
         />
+        <Stack.Screen
+          name="medications/index"
+          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+        />
       </Stack>
     </PaperProvider>
   );

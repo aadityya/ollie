@@ -118,4 +118,21 @@ export async function runMigrations(db: SQLiteDatabase): Promise<void> {
     );
     CREATE INDEX IF NOT EXISTS idx_happiness_baby_date ON happiness_records(baby_id, date);
   `);
+
+  // v4 migration: medications
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS medications (
+      id TEXT PRIMARY KEY,
+      baby_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      dosage TEXT,
+      frequency TEXT,
+      start_date TEXT NOT NULL,
+      end_date TEXT,
+      notes TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (baby_id) REFERENCES babies(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_medications_baby ON medications(baby_id);
+  `);
 }

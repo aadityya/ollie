@@ -38,6 +38,17 @@ export async function insertMemory(
   return { ...data, id, createdAt: now };
 }
 
+export async function updateMemory(
+  id: string,
+  data: { title: string; date: string; description?: string }
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    'UPDATE memories SET title = ?, date = ?, description = ? WHERE id = ?',
+    [data.title, data.date, data.description ?? null, id]
+  );
+}
+
 export async function deleteMemory(id: string): Promise<void> {
   const db = await getDatabase();
   await db.runAsync('DELETE FROM memories WHERE id = ?', [id]);

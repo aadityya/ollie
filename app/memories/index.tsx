@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { ScrollView, View, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
+import React, { useState, useCallback, useRef } from 'react';
+import { ScrollView, View, StyleSheet, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -15,10 +15,12 @@ export default function MemoriesScreen() {
   const baby = useBabyStore((s) => s.activeBaby);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
 
   const loadData = useCallback(async () => {
     if (!baby?.id) return;
@@ -28,18 +30,42 @@ export default function MemoriesScreen() {
 
   useFocusEffect(useCallback(() => { loadData(); }, [loadData]));
 
+  const resetForm = () => {
+    setTitle('');
+    setDate(new Date().toISOString().split('T')[0]);
+    setDescription('');
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const startEdit = (memory: Memory) => {
+    setEditingId(memory.id);
+    setTitle(memory.title);
+    setDate(memory.date);
+    setDescription(memory.description ?? '');
+    setShowForm(true);
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300);
+  };
+
   const handleSave = async () => {
     if (!baby?.id || !title.trim() || !date.trim()) return;
     setSaving(true);
     try {
-      await memoryRepo.insertMemory({
-        babyId: baby.id,
-        title: title.trim(),
-        date: date.trim(),
-        description: description.trim() || undefined,
-      });
-      setTitle(''); setDate(new Date().toISOString().split('T')[0]); setDescription('');
-      setShowForm(false);
+      if (editingId) {
+        await memoryRepo.updateMemory(editingId, {
+          title: title.trim(),
+          date: date.trim(),
+          description: description.trim() || undefined,
+        });
+      } else {
+        await memoryRepo.insertMemory({
+          babyId: baby.id,
+          title: title.trim(),
+          date: date.trim(),
+          description: description.trim() || undefined,
+        });
+      }
+      resetForm();
       await loadData();
     } catch (e) {
       Alert.alert('Error', 'Failed to save memory.');
@@ -53,6 +79,7 @@ export default function MemoriesScreen() {
       {
         text: 'Delete', style: 'destructive', onPress: async () => {
           await memoryRepo.deleteMemory(memory.id);
+          if (editingId === memory.id) resetForm();
           await loadData();
         },
       },
@@ -61,7 +88,12 @@ export default function MemoriesScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: ollie.bg }]}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
@@ -84,25 +116,35 @@ export default function MemoriesScreen() {
         )}
 
         {memories.map((memory) => (
-          <Pressable
+          <View
             key={memory.id}
             style={[styles.card, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}
-            onLongPress={() => handleDelete(memory)}
           >
             <Text style={[styles.cardTitle, { color: ollie.textPrimary }]}>{memory.title}</Text>
             <Text style={[styles.cardDate, { color: ollie.accent }]}>{memory.date}</Text>
             {memory.description && (
               <Text style={[styles.cardDesc, { color: ollie.textSecondary }]}>{memory.description}</Text>
             )}
-          </Pressable>
+            <View style={styles.cardActions}>
+              <Pressable onPress={() => startEdit(memory)}>
+                <Text style={[styles.actionText, { color: ollie.accent }]}>Edit</Text>
+              </Pressable>
+              <Pressable onPress={() => handleDelete(memory)}>
+                <Text style={[styles.actionText, { color: ollie.textLight }]}>Delete</Text>
+              </Pressable>
+            </View>
+          </View>
         ))}
 
         {showForm && (
           <View style={[styles.form, { backgroundColor: ollie.bgCard, borderRadius: ollie.radius }]}>
-            <Text style={[styles.formTitle, { color: ollie.textPrimary }]}>New Memory</Text>
+            <Text style={[styles.formTitle, { color: ollie.textPrimary }]}>
+              {editingId ? 'Edit Memory' : 'New Memory'}
+            </Text>
             <TextInput
               style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
               value={title} onChangeText={setTitle} placeholder="First smile, first word..." placeholderTextColor={ollie.textLight}
+              onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
             />
             <View style={{ marginBottom: 10 }}>
               <DateField value={date} onChange={setDate} />
@@ -111,9 +153,10 @@ export default function MemoriesScreen() {
               style={[styles.input, styles.textArea, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
               value={description} onChangeText={setDescription} placeholder="Describe this moment..." placeholderTextColor={ollie.textLight}
               multiline numberOfLines={4}
+              onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
             />
             <View style={styles.formActions}>
-              <Pressable onPress={() => setShowForm(false)}>
+              <Pressable onPress={resetForm}>
                 <Text style={[styles.cancelBtn, { color: ollie.textSecondary }]}>Cancel</Text>
               </Pressable>
               <Pressable
@@ -130,18 +173,20 @@ export default function MemoriesScreen() {
         {!showForm && (
           <Pressable
             style={[styles.addBtn, { borderColor: ollie.accent }]}
-            onPress={() => setShowForm(true)}
+            onPress={() => { setEditingId(null); setShowForm(true); setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300); }}
           >
             <Text style={[styles.addBtnText, { color: ollie.accent }]}>+ Add Memory</Text>
           </Pressable>
         )}
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
+  flex: { flex: 1 },
   scroll: { flex: 1 },
   content: { padding: 20, paddingBottom: 40 },
   backBtn: { marginBottom: 8 },
@@ -155,6 +200,8 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 16, fontFamily: 'Nunito_700Bold', marginBottom: 4 },
   cardDate: { fontSize: 13, fontFamily: 'Nunito_600SemiBold', marginBottom: 4 },
   cardDesc: { fontSize: 13, marginTop: 4, lineHeight: 18 },
+  cardActions: { flexDirection: 'row', gap: 20, marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f0e8df' },
+  actionText: { fontSize: 13, fontFamily: 'Nunito_700Bold' },
   form: { padding: 16, marginTop: 16 },
   formTitle: { fontSize: 16, fontFamily: 'Nunito_700Bold', marginBottom: 12 },
   input: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, fontSize: 15, fontFamily: 'Nunito_400Regular', marginBottom: 10 },

@@ -27,6 +27,7 @@ export default function MeasurementsScreen() {
   const [records, setRecords] = useState<GrowthRecord[]>([]);
   const [activeTab, setActiveTab] = useState<MeasureType>('weight');
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [value, setValue] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [saving, setSaving] = useState(false);
@@ -42,6 +43,44 @@ export default function MeasurementsScreen() {
     loadRecords();
   }, [loadRecords]);
 
+  const resetForm = () => {
+    setValue('');
+    setDate(new Date().toISOString().split('T')[0]);
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const startEdit = (r: GrowthRecord) => {
+    let val = 0;
+    let tab: MeasureType = 'weight';
+    if (r.weightKg) { val = r.weightKg; tab = 'weight'; }
+    else if (r.heightCm) { val = r.heightCm; tab = 'height'; }
+    else if (r.headCircumferenceCm) { val = r.headCircumferenceCm; tab = 'head'; }
+    setActiveTab(tab);
+    setEditingId(r.id);
+    setValue(String(val));
+    setDate(r.recordedAt);
+    setShowForm(true);
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300);
+  };
+
+  const handleDelete = (r: GrowthRecord) => {
+    const vals: string[] = [];
+    if (r.weightKg) vals.push(`${r.weightKg} kg`);
+    if (r.heightCm) vals.push(`${r.heightCm} cm`);
+    if (r.headCircumferenceCm) vals.push(`Head: ${r.headCircumferenceCm} cm`);
+    Alert.alert('Delete Record', `Delete ${vals.join(', ')} from ${new Date(r.recordedAt).toLocaleDateString()}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete', style: 'destructive', onPress: async () => {
+          await growthRepo.deleteGrowthRecord(r.id);
+          if (editingId === r.id) resetForm();
+          await loadRecords();
+        },
+      },
+    ]);
+  };
+
   const handleSave = async () => {
     if (!baby?.id || !value || saving) return;
     setSaving(true);
@@ -54,15 +93,18 @@ export default function MeasurementsScreen() {
     }
 
     try {
-      await growthRepo.insertGrowthRecord({
-        babyId: baby.id,
+      const data = {
         recordedAt: date,
         weightKg: activeTab === 'weight' ? numVal : undefined,
         heightCm: activeTab === 'height' ? numVal : undefined,
         headCircumferenceCm: activeTab === 'head' ? numVal : undefined,
-      });
-      setValue('');
-      setShowForm(false);
+      };
+      if (editingId) {
+        await growthRepo.updateGrowthRecord(editingId, data);
+      } else {
+        await growthRepo.insertGrowthRecord({ babyId: baby.id, ...data });
+      }
+      resetForm();
       await loadRecords();
     } catch (e) {
       Alert.alert('Error', 'Failed to save measurement');
@@ -89,7 +131,6 @@ export default function MeasurementsScreen() {
 
   const chartData = getChartData();
   const tabInfo = TABS.find((t) => t.key === activeTab)!;
-
   const latestVal = chartData.length > 0 ? chartData[chartData.length - 1].value : null;
 
   const percentileText = (() => {
@@ -210,23 +251,33 @@ export default function MeasurementsScreen() {
               if (r.headCircumferenceCm) vals.push(`Head: ${r.headCircumferenceCm} cm`);
               return (
                 <View key={r.id} style={[styles.recordRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}>
-                  <Text style={[styles.recordDate, { color: ollie.textSecondary }]}>
-                    {new Date(r.recordedAt).toLocaleDateString()}
-                  </Text>
-                  <Text style={[styles.recordVals, { color: ollie.textPrimary }]}>
-                    {vals.join(' | ')}
-                  </Text>
+                  <View style={styles.recordInfo}>
+                    <Text style={[styles.recordDate, { color: ollie.textSecondary }]}>
+                      {new Date(r.recordedAt).toLocaleDateString()}
+                    </Text>
+                    <Text style={[styles.recordVals, { color: ollie.textPrimary }]}>
+                      {vals.join(' | ')}
+                    </Text>
+                  </View>
+                  <View style={styles.recordActions}>
+                    <Pressable onPress={() => startEdit(r)}>
+                      <Text style={[styles.actionText, { color: ollie.accent }]}>Edit</Text>
+                    </Pressable>
+                    <Pressable onPress={() => handleDelete(r)}>
+                      <Text style={[styles.actionText, { color: ollie.textLight }]}>Delete</Text>
+                    </Pressable>
+                  </View>
                 </View>
               );
             })}
           </View>
         )}
 
-        {/* Add Form */}
+        {/* Add/Edit Form */}
         {showForm ? (
           <View style={[styles.formCard, { backgroundColor: ollie.bgCard, borderRadius: ollie.radius }]}>
             <Text style={[styles.formTitle, { color: ollie.textPrimary }]}>
-              Add {tabInfo.label} ({tabInfo.unit})
+              {editingId ? 'Edit' : 'Add'} {tabInfo.label} ({tabInfo.unit})
             </Text>
             <TextInput
               style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
@@ -242,7 +293,7 @@ export default function MeasurementsScreen() {
             <View style={styles.formButtons}>
               <Pressable
                 style={[styles.formBtn, { backgroundColor: ollie.bgSecondary }]}
-                onPress={() => setShowForm(false)}
+                onPress={resetForm}
               >
                 <Text style={[styles.formBtnText, { color: ollie.textSecondary }]}>Cancel</Text>
               </Pressable>
@@ -259,7 +310,7 @@ export default function MeasurementsScreen() {
         ) : (
           <Pressable
             style={[styles.addBtn, { backgroundColor: ollie.accent, borderRadius: ollie.radiusSm }]}
-            onPress={() => setShowForm(true)}
+            onPress={() => { setEditingId(null); setShowForm(true); setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300); }}
           >
             <Text style={styles.addBtnText}>+ Add Measurement</Text>
           </Pressable>
@@ -277,108 +328,32 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 40 },
   backBtn: { marginBottom: 8 },
   backText: { fontSize: 16, fontFamily: 'Nunito_600SemiBold' },
-  title: {
-    fontSize: 24,
-    fontFamily: 'Nunito_800ExtraBold',
-    marginBottom: 16,
-  },
-  tabs: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  tabText: {
-    fontSize: 14,
-    fontFamily: 'Nunito_700Bold',
-  },
-  currentCard: {
-    padding: 20,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
+  title: { fontSize: 24, fontFamily: 'Nunito_800ExtraBold', marginBottom: 16 },
+  tabs: { flexDirection: 'row', gap: 8, marginBottom: 16 },
+  tab: { flex: 1, paddingVertical: 10, alignItems: 'center' },
+  tabText: { fontSize: 14, fontFamily: 'Nunito_700Bold' },
+  currentCard: { padding: 20, alignItems: 'center', marginBottom: 16 },
   currentLabel: { fontSize: 13, marginBottom: 4 },
-  percentileText: {
-    fontSize: 14,
-    fontFamily: 'Nunito_700Bold',
-    marginTop: 6,
-  },
-  currentValue: {
-    fontSize: 32,
-    fontFamily: 'Nunito_800ExtraBold',
-  },
-  chartCard: {
-    padding: 16,
-    marginBottom: 16,
-  },
-  chartTitle: {
-    fontSize: 15,
-    fontFamily: 'Nunito_700Bold',
-    marginBottom: 12,
-  },
-  emptyChart: {
-    padding: 32,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
+  percentileText: { fontSize: 14, fontFamily: 'Nunito_700Bold', marginTop: 6 },
+  currentValue: { fontSize: 32, fontFamily: 'Nunito_800ExtraBold' },
+  chartCard: { padding: 16, marginBottom: 16 },
+  chartTitle: { fontSize: 15, fontFamily: 'Nunito_700Bold', marginBottom: 12 },
+  emptyChart: { padding: 32, alignItems: 'center', marginBottom: 16 },
   emptyText: { fontSize: 14, textAlign: 'center' },
   history: { marginBottom: 16 },
-  historyTitle: {
-    fontSize: 16,
-    fontFamily: 'Nunito_700Bold',
-    marginBottom: 8,
-  },
-  recordRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 12,
-    marginBottom: 6,
-  },
+  historyTitle: { fontSize: 16, fontFamily: 'Nunito_700Bold', marginBottom: 8 },
+  recordRow: { padding: 12, marginBottom: 6 },
+  recordInfo: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
   recordDate: { fontSize: 13 },
   recordVals: { fontSize: 13, fontFamily: 'Nunito_600SemiBold' },
-  formCard: {
-    padding: 16,
-    gap: 10,
-  },
-  formTitle: {
-    fontSize: 16,
-    fontFamily: 'Nunito_700Bold',
-    marginBottom: 4,
-  },
-  input: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    fontSize: 15,
-    fontFamily: 'Nunito_400Regular',
-  },
-  formButtons: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 4,
-  },
-  formBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  formBtnText: {
-    fontSize: 15,
-    fontFamily: 'Nunito_700Bold',
-  },
-  addBtn: {
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  addBtnText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontFamily: 'Nunito_700Bold',
-  },
+  recordActions: { flexDirection: 'row', gap: 20, borderTopWidth: 1, borderTopColor: '#f0e8df', paddingTop: 8 },
+  actionText: { fontSize: 13, fontFamily: 'Nunito_700Bold' },
+  formCard: { padding: 16, gap: 10 },
+  formTitle: { fontSize: 16, fontFamily: 'Nunito_700Bold', marginBottom: 4 },
+  input: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, fontSize: 15, fontFamily: 'Nunito_400Regular' },
+  formButtons: { flexDirection: 'row', gap: 10, marginTop: 4 },
+  formBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
+  formBtnText: { fontSize: 15, fontFamily: 'Nunito_700Bold' },
+  addBtn: { paddingVertical: 16, alignItems: 'center' },
+  addBtnText: { color: '#FFFFFF', fontSize: 16, fontFamily: 'Nunito_700Bold' },
 });

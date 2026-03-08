@@ -49,6 +49,17 @@ export async function insertGrowthRecord(
   return { ...data, id, createdAt: now };
 }
 
+export async function updateGrowthRecord(
+  id: string,
+  data: { recordedAt: string; weightKg?: number; heightCm?: number; headCircumferenceCm?: number }
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync(
+    'UPDATE growth_records SET recorded_at = ?, weight_kg = ?, height_cm = ?, head_circumference_cm = ? WHERE id = ?',
+    [data.recordedAt, data.weightKg ?? null, data.heightCm ?? null, data.headCircumferenceCm ?? null, id]
+  );
+}
+
 export async function deleteGrowthRecord(id: string): Promise<void> {
   const db = await getDatabase();
   await db.runAsync('DELETE FROM growth_records WHERE id = ?', [id]);
