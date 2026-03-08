@@ -4,6 +4,15 @@ import { Text } from 'react-native-paper';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { calculateAge } from '@/src/utils/dateHelpers';
+import { AppIcons, IconComponent } from '@/src/constants/icons';
+
+function getBabyIcon(gender?: string): IconComponent {
+  switch (gender) {
+    case 'boy': return AppIcons.boy;
+    case 'girl': return AppIcons.girl;
+    default: return AppIcons.genderNeutral;
+  }
+}
 
 interface BabySwitcherProps {
   compact?: boolean;
@@ -22,11 +31,14 @@ export function BabySwitcher({ compact }: BabySwitcherProps) {
     setShowPicker(false);
   };
 
+  const BabyIcon = getBabyIcon(activeBaby?.gender);
+
   const trigger = compact ? (
     <Pressable
       style={[styles.compactTrigger, { backgroundColor: ollie.accentLight, borderRadius: ollie.radiusSm }]}
       onPress={() => setShowPicker(true)}
     >
+      <BabyIcon width={20} height={20} />
       <Text style={[styles.compactName, { color: ollie.accent }]} numberOfLines={1}>
         {activeBaby?.name ?? 'Baby'}
       </Text>
@@ -37,6 +49,7 @@ export function BabySwitcher({ compact }: BabySwitcherProps) {
       style={[styles.switcher, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}
       onPress={() => setShowPicker(true)}
     >
+      <BabyIcon width={40} height={40} />
       <View style={styles.babyInfo}>
         <Text style={[styles.babyName, { color: ollie.textPrimary }]}>
           {activeBaby?.name ?? 'No baby selected'}
@@ -62,27 +75,31 @@ export function BabySwitcher({ compact }: BabySwitcherProps) {
           <Pressable style={[styles.modal, { backgroundColor: ollie.bgCard }]} onPress={(e) => e.stopPropagation()}>
             <Text style={[styles.modalTitle, { color: ollie.textPrimary }]}>Switch Baby</Text>
 
-            {babies.map((baby) => (
-              <Pressable
-                key={baby.id}
-                style={[
-                  styles.babyRow,
-                  {
-                    backgroundColor: baby.id === activeBaby?.id ? ollie.accentLight : ollie.bgSecondary,
-                    borderRadius: ollie.radiusSm,
-                  },
-                ]}
-                onPress={() => handleSelect(baby.id)}
-              >
-                <Text style={[styles.rowName, { color: ollie.textPrimary }]}>{baby.name}</Text>
-                <Text style={[styles.rowAge, { color: ollie.textLight }]}>
-                  {calculateAge(baby.dateOfBirth)}
-                </Text>
-                {baby.id === activeBaby?.id && (
-                  <Text style={[styles.activeBadge, { color: ollie.accent }]}>Active</Text>
-                )}
-              </Pressable>
-            ))}
+            {babies.map((baby) => {
+              const RowIcon = getBabyIcon(baby.gender);
+              return (
+                <Pressable
+                  key={baby.id}
+                  style={[
+                    styles.babyRow,
+                    {
+                      backgroundColor: baby.id === activeBaby?.id ? ollie.accentLight : ollie.bgSecondary,
+                      borderRadius: ollie.radiusSm,
+                    },
+                  ]}
+                  onPress={() => handleSelect(baby.id)}
+                >
+                  <RowIcon width={28} height={28} />
+                  <Text style={[styles.rowName, { color: ollie.textPrimary }]}>{baby.name}</Text>
+                  <Text style={[styles.rowAge, { color: ollie.textLight }]}>
+                    {calculateAge(baby.dateOfBirth)}
+                  </Text>
+                  {baby.id === activeBaby?.id && (
+                    <Text style={[styles.activeBadge, { color: ollie.accent }]}>Active</Text>
+                  )}
+                </Pressable>
+              );
+            })}
           </Pressable>
         </Pressable>
       </Modal>
@@ -96,12 +113,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 5,
-    gap: 4,
+    gap: 6,
   },
   compactName: {
     fontSize: 13,
     fontFamily: 'Nunito_700Bold',
-    maxWidth: 100,
+    maxWidth: 80,
   },
   compactArrow: {
     fontSize: 11,
@@ -112,6 +129,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     width: '100%',
+    gap: 12,
   },
   babyInfo: { flex: 1 },
   babyName: {
@@ -147,6 +165,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 14,
     marginBottom: 8,
+    gap: 10,
   },
   rowName: {
     flex: 1,

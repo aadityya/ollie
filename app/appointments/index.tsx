@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
+import { DateField } from '@/src/components/DateField';
+import { TimeField } from '@/src/components/TimeField';
 import { Appointment } from '@/src/types';
 import * as appointmentRepo from '@/src/db/repositories/appointmentRepository';
 
@@ -134,16 +136,12 @@ export default function AppointmentsScreen() {
               style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
               value={title} onChangeText={setTitle} placeholder="Title" placeholderTextColor={ollie.textLight}
             />
-            <TextInput
-              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
-              value={date} onChangeText={setDate} placeholder="Date (YYYY-MM-DD)" placeholderTextColor={ollie.textLight}
-              keyboardType="numbers-and-punctuation"
-            />
-            <TextInput
-              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
-              value={time} onChangeText={setTime} placeholder="Time (HH:MM, optional)" placeholderTextColor={ollie.textLight}
-              keyboardType="numbers-and-punctuation"
-            />
+            <View style={{ marginBottom: 10 }}>
+              <DateField value={date} onChange={setDate} />
+            </View>
+            <View style={{ marginBottom: 10 }}>
+              <TimeField value={time} onChange={setTime} label="Time (optional)" />
+            </View>
             <TextInput
               style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
               value={location} onChangeText={setLocation} placeholder="Location (optional)" placeholderTextColor={ollie.textLight}

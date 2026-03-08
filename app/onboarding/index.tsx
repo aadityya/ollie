@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable, TextInput, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, Pressable, TextInput, KeyboardAvoidingView, Platform, ScrollView, useWindowDimensions } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
-import { WelcomeScreenLogo } from '@/src/constants/icons';
+import { WelcomeLogo } from '@/src/constants/icons';
+import { DateField } from '@/src/components/DateField';
 import { generateMockData } from '@/src/utils/mockData';
 
 interface BabyEntry {
@@ -18,6 +19,7 @@ interface BabyEntry {
 export default function OnboardingScreen() {
   const { ollie } = useAppTheme();
   const router = useRouter();
+  const { height: screenHeight } = useWindowDimensions();
   const addBaby = useBabyStore((s) => s.addBaby);
   const setOnboardingCompleted = useSettingsStore((s) => s.setOnboardingCompleted);
 
@@ -88,12 +90,9 @@ export default function OnboardingScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.heroImage}>
-            <WelcomeScreenLogo width={220} height={220} />
+          <View style={[styles.heroImage, { height: screenHeight / 2 }]}>
+            <WelcomeLogo width={screenHeight * 0.4} height={screenHeight * 0.4} />
           </View>
-          <Text style={[styles.title, { color: ollie.textPrimary }]}>
-            Welcome to Ollie
-          </Text>
           <Text style={[styles.subtitle, { color: ollie.textSecondary }]}>
             Add your little ones to get started
           </Text>
@@ -121,19 +120,17 @@ export default function OnboardingScreen() {
                 autoFocus={index === 0}
               />
 
-              <Text style={[styles.label, { color: ollie.textSecondary }]}>Date of Birth</Text>
-              <TextInput
-                style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
+              <DateField
+                label="Date of Birth"
                 value={baby.dob}
-                onChangeText={(v) => updateBaby(index, 'dob', v)}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={ollie.textLight}
-                keyboardType="numbers-and-punctuation"
+                onChange={(v) => updateBaby(index, 'dob', v)}
+                maximumDate={new Date()}
+                minimumDate={new Date(2020, 0, 1)}
               />
 
               <Text style={[styles.label, { color: ollie.textSecondary }]}>Gender</Text>
               <View style={styles.genderRow}>
-                {(['boy', 'girl'] as const).map((g) => (
+                {(['boy', 'girl', 'genderNeutral'] as const).map((g) => (
                   <Pressable
                     key={g}
                     style={[
@@ -146,7 +143,7 @@ export default function OnboardingScreen() {
                     onPress={() => updateBaby(index, 'gender', g)}
                   >
                     <Text style={[styles.genderText, { color: baby.gender === g ? '#FFFFFF' : ollie.textSecondary }]}>
-                      {g === 'boy' ? 'Boy' : 'Girl'}
+                      {g === 'boy' ? 'Boy' : g === 'girl' ? 'Girl' : 'Neutral'}
                     </Text>
                   </Pressable>
                 ))}
@@ -177,7 +174,7 @@ export default function OnboardingScreen() {
             disabled={saving || loadingMock}
           >
             <Text style={[styles.mockBtnText, { color: ollie.textSecondary }]}>
-              {loadingMock ? 'Generating data...' : 'Try with Mock Data'}
+              {loadingMock ? 'Generating data...' : 'Explore with Mock Data'}
             </Text>
           </Pressable>
         </ScrollView>
@@ -196,13 +193,8 @@ const styles = StyleSheet.create({
   },
   heroImage: {
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 12,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: 'Nunito_800ExtraBold',
-    textAlign: 'center',
-    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,

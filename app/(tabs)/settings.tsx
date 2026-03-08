@@ -13,6 +13,7 @@ import { useBabyStore } from '@/src/stores/useBabyStore';
 import { resetDatabase } from '@/src/db/database';
 import { APP_VERSION } from '@/src/constants/version';
 import { ThemeName } from '@/src/types';
+import { AppIcons } from '@/src/constants/icons';
 
 export default function SettingsScreen() {
   const { ollie } = useAppTheme();
@@ -33,6 +34,7 @@ export default function SettingsScreen() {
   const [newActivity, setNewActivity] = useState('');
 
   const activeBaby = useBabyStore((s) => s.activeBaby);
+  const updateBaby = useBabyStore((s) => s.updateBaby);
   const setBabyTheme = useBabyStore((s) => s.setBabyTheme);
   const clearAll = useBabyStore((s) => s.clearAll);
 
@@ -76,11 +78,15 @@ export default function SettingsScreen() {
         style={[styles.container, { backgroundColor: ollie.bg }]}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <ScreenHeader title="Settings" subtitle="Customize your experience" />
+        <View style={styles.badgeWrap}>
+          <BabySwitcher />
+        </View>
 
-        {/* Profile */}
-        <Text style={[styles.groupTitle, { color: ollie.textLight }]}>PROFILE</Text>
+        {/* User Profile */}
+        <Text style={[styles.groupTitle, { color: ollie.textLight }]}>YOUR PROFILE</Text>
         {editingName ? (
           <View style={[styles.nameEditRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}>
             <TextInput
@@ -110,8 +116,36 @@ export default function SettingsScreen() {
           />
         )}
 
-        {/* Baby Switcher */}
-        <BabySwitcher />
+        {/* Baby Profile */}
+        {activeBaby && (
+          <>
+            <Text style={[styles.groupTitle, { color: ollie.textLight }]}>BABY PROFILE</Text>
+            <View style={[styles.iconPickerRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}>
+              {([
+                { key: 'boy', label: 'Boy', icon: AppIcons.boy },
+                { key: 'girl', label: 'Girl', icon: AppIcons.girl },
+                { key: 'genderNeutral', label: 'Neutral', icon: AppIcons.genderNeutral },
+              ] as const).map(({ key, label, icon: Icon }) => {
+                const isSelected = activeBaby.gender === key;
+                return (
+                  <Pressable
+                    key={key}
+                    style={[
+                      styles.iconPickerItem,
+                      isSelected && { backgroundColor: ollie.accentLight, borderRadius: ollie.radiusSm },
+                    ]}
+                    onPress={() => updateBaby(activeBaby.id, { gender: key })}
+                  >
+                    <Icon width={48} height={48} />
+                    <Text style={[styles.iconPickerLabel, { color: isSelected ? ollie.accent : ollie.textLight }]}>
+                      {label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </>
+        )}
 
         {/* Custom Activities */}
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>CUSTOM ACTIVITIES</Text>
@@ -191,6 +225,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   container: { flex: 1 },
   content: { padding: 20, paddingTop: 16, paddingBottom: 40 },
+  badgeWrap: { marginTop: 4, marginBottom: 16 },
   groupTitle: {
     fontSize: 13,
     fontFamily: 'Nunito_700Bold',
@@ -265,5 +300,19 @@ const styles = StyleSheet.create({
   addActivityBtn: {
     fontSize: 14,
     fontFamily: 'Nunito_700Bold',
+  },
+  iconPickerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    padding: 16,
+  },
+  iconPickerItem: {
+    alignItems: 'center',
+    padding: 12,
+    gap: 6,
+  },
+  iconPickerLabel: {
+    fontSize: 12,
+    fontFamily: 'Nunito_600SemiBold',
   },
 });

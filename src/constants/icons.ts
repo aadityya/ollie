@@ -70,15 +70,15 @@ export const AppIcons: Record<string, IconComponent> = {
 };
 
 export const MoodIcons: IconComponent[] = [
-  MoodDistressedIcon, // score 1 - Tough
-  MoodFussyIcon,      // score 2 - Hard
-  MoodCalmIcon,       // score 3 - Okay
-  MoodContentIcon,    // score 4 - Good
-  MoodHappyIcon,      // score 5 - Great
+  MoodFussyIcon,      // Hard (index 0)
+  MoodCalmIcon,       // Okay (index 1)
+  MoodHappyIcon,      // Great (index 2)
 ];
 
 // Welcome screen
 import WelcomeScreenLogoIcon from '../../assets/icons/welcome-screen-logo.svg';
+import WelcomeLogoIcon from '../../assets/icons/welcome-logo.svg';
 export const WelcomeScreenLogo = WelcomeScreenLogoIcon;
+export const WelcomeLogo = WelcomeLogoIcon;
 
 export const WelcomeBg = require('../../assets/images/welcome-bg.jpg');

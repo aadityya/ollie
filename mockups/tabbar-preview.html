@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ollie - Tab Bar Icon Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #1a1a2e;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 60px;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+
+  .column { text-align: center; }
+  .label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .label span { color: #fff; font-size: 16px; display: block; }
+
+  /* Phone frame */
+  .phone {
+    width: 375px;
+    height: 812px;
+    border-radius: 40px;
+    overflow: hidden;
+    border: 4px solid #333;
+    background: #f8f8f8;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Notch */
+  .notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 30px;
+    background: #222;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    z-index: 10;
+  }
+
+  /* Content area */
+  .content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    padding-top: 50px;
+  }
+
+  /* Shared content styles */
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .greeting { font-size: 22px; font-weight: 800; color: #222; }
+  .subtitle { font-size: 13px; color: #888; margin-top: 2px; }
+  .baby-chip {
+    background: #e8e8e8;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #555;
+  }
+  .motivational {
+    font-size: 12px;
+    font-style: italic;
+    color: #aaa;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  /* Summary cards */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .summary-card {
+    border-radius: 15px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .summary-card .sc-icon { font-size: 28px; }
+  .summary-card .sc-val { font-size: 15px; font-weight: 800; color: #222; }
+  .summary-card .sc-label { font-size: 9px; font-weight: 600; }
+  .summary-card .sc-sub { font-size: 8px; opacity: 0.7; }
+  .sc-feed { background: #FFF0F0; color: #D4646A; }
+  .sc-sleep { background: #E8F0FF; color: #5B8BD4; }
+  .sc-pee { background: #FFF8E0; color: #D4A64A; }
+  .sc-poop { background: #F0F5E8; color: #7BAF5A; }
+
+  /* Happiness */
+  .happiness {
+    background: #fff;
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  .happiness .h-title { font-size: 14px; font-weight: 700; color: #222; margin-bottom: 8px; }
+  .happiness .h-row { display: flex; justify-content: space-between; }
+  .happiness .h-item { text-align: center; padding: 6px 8px; border-radius: 8px; }
+  .happiness .h-item.selected { background: #f0e8ff; }
+  .happiness .h-emoji { font-size: 22px; }
+  .happiness .h-label { font-size: 9px; color: #aaa; font-weight: 600; }
+
+  /* Activity grid */
+  .section-title { font-size: 16px; font-weight: 700; color: #222; margin-bottom: 10px; }
+  .activity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .activity-card {
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .activity-card .ac-icon { font-size: 28px; }
+  .activity-card .ac-label { font-size: 10px; font-weight: 700; }
+  .activity-card .ac-sub { font-size: 8px; opacity: 0.7; }
+  .ac-feed { background: #FFF0F0; color: #D4646A; }
+  .ac-sleep { background: #E8F0FF; color: #5B8BD4; }
+  .ac-pee { background: #FFF8E0; color: #D4A64A; }
+  .ac-poop { background: #F0F5E8; color: #7BAF5A; }
+
+  /* ====== CURRENT: WITH TEXT ====== */
+  .bottom-bar-current {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 110px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    padding-bottom: 30px;
+    padding-top: 14px;
+    flex-shrink: 0;
+  }
+  .bottom-bar-current .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .bottom-bar-current .tab .icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .bottom-bar-current .tab .tab-label {
+    font-size: 10px;
+    color: #aaa;
+    font-weight: 600;
+  }
+  .bottom-bar-current .tab.active .tab-label { color: #333; }
+  .bottom-bar-current .tab.active .icon { opacity: 1; }
+  .bottom-bar-current .tab .icon { opacity: 0.5; }
+
+  /* ====== PROPOSED: ICONS ONLY ====== */
+  .bottom-bar-proposed {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 80px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    padding-bottom: 20px;
+    padding-top: 10px;
+    flex-shrink: 0;
+  }
+  .bottom-bar-proposed .tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    transition: background 0.2s;
+  }
+  .bottom-bar-proposed .tab .icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    opacity: 0.4;
+  }
+  .bottom-bar-proposed .tab.active {
+    background: #f0f0f0;
+  }
+  .bottom-bar-proposed .tab.active .icon {
+    opacity: 1;
+  }
+
+  /* Arrow between mockups */
+  .arrow-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    align-self: center;
+  }
+  .arrow-col .arrow { font-size: 40px; color: #555; }
+  .arrow-col .arrow-text { font-size: 12px; color: #666; font-weight: 600; }
+
+  /* Callout boxes */
+  .callout {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 14px 16px;
+    max-width: 375px;
+  }
+  .callout h3 {
+    font-size: 12px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .callout ul {
+    list-style: none;
+    padding: 0;
+  }
+  .callout li {
+    font-size: 13px;
+    color: #ccc;
+    padding: 3px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .callout li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #666;
+  }
+  .callout li.pro::before { content: '✓'; color: #6dba6d; }
+  .callout li.con::before { content: '✗'; color: #d46464; }
+
+  /* Zoom comparison at bottom */
+  .zoom-section {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  .zoom-box {
+    background: #222;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+  }
+  .zoom-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .zoom-bar {
+    background: #fff;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 20px;
+  }
+  .zoom-bar .ztab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .zoom-bar .ztab .zicon { font-size: 32px; }
+  .zoom-bar .ztab .zlabel { font-size: 11px; color: #aaa; font-weight: 600; }
+  .zoom-bar .ztab.active .zlabel { color: #333; }
+
+  .zoom-bar-big {
+    background: #fff;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 14px 16px;
+  }
+  .zoom-bar-big .ztab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+  }
+  .zoom-bar-big .ztab.active { background: #f0f0f0; }
+  .zoom-bar-big .ztab .zicon { font-size: 34px; opacity: 0.4; }
+  .zoom-bar-big .ztab.active .zicon { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- CURRENT: With Labels -->
+<div class="column">
+  <div class="label"><span>Current</span>Icons + Labels</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="content-area">
+      <div class="header-row">
+        <div>
+          <div class="greeting">Good morning Mom!</div>
+          <div class="subtitle">Ollie is 4 months</div>
+        </div>
+        <div class="baby-chip">Ollie &rsaquo;</div>
+      </div>
+      <div class="motivational">Every small moment matters</div>
+      <div class="summary-grid">
+        <div class="summary-card sc-feed"><div class="sc-icon">🍼</div><div class="sc-val">3</div><div class="sc-label">Feedings</div><div class="sc-sub">today</div></div>
+        <div class="summary-card sc-sleep"><div class="sc-icon">😴</div><div class="sc-val">2h 30m</div><div class="sc-label">Sleep</div><div class="sc-sub">today</div></div>
+        <div class="summary-card sc-pee"><div class="sc-icon">💧</div><div class="sc-val">4</div><div class="sc-label">Wet Diapers</div><div class="sc-sub">today</div></div>
+        <div class="summary-card sc-poop"><div class="sc-icon">💩</div><div class="sc-val">1</div><div class="sc-label">Dirty Diapers</div><div class="sc-sub">today</div></div>
+      </div>
+      <div class="happiness">
+        <div class="h-title">How's Ollie's day?</div>
+        <div class="h-row">
+          <div class="h-item"><div class="h-emoji" style="opacity:0.4">😢</div><div class="h-label">Tough</div></div>
+          <div class="h-item"><div class="h-emoji" style="opacity:0.4">😟</div><div class="h-label">Hard</div></div>
+          <div class="h-item"><div class="h-emoji" style="opacity:0.4">😐</div><div class="h-label">Okay</div></div>
+          <div class="h-item selected"><div class="h-emoji">🙂</div><div class="h-label" style="color:#7B5BD4">Good</div></div>
+          <div class="h-item"><div class="h-emoji" style="opacity:0.4">😄</div><div class="h-label">Great</div></div>
+        </div>
+      </div>
+      <div class="section-title">Log Activity</div>
+      <div class="activity-grid">
+        <div class="activity-card ac-feed"><div class="ac-icon">🍼</div><div class="ac-label">Feeding</div><div class="ac-sub">Breast / Bottle</div></div>
+        <div class="activity-card ac-sleep"><div class="ac-icon">😴</div><div class="ac-label">Sleep</div><div class="ac-sub">Nap / Night</div></div>
+        <div class="activity-card ac-pee"><div class="ac-icon">💧</div><div class="ac-label">Pee</div><div class="ac-sub">Wet diaper</div></div>
+        <div class="activity-card ac-poop"><div class="ac-icon">💩</div><div class="ac-label">Poop</div><div class="ac-sub">Dirty diaper</div></div>
+      </div>
+    </div>
+    <div class="bottom-bar-current">
+      <div class="tab active"><div class="icon">🏠</div><div class="tab-label">Home</div></div>
+      <div class="tab"><div class="icon">📋</div><div class="tab-label">Timeline</div></div>
+      <div class="tab"><div class="icon">📊</div><div class="tab-label">Insights</div></div>
+      <div class="tab"><div class="icon">⋯</div><div class="tab-label">More</div></div>
+    </div>
+  </div>
+  <div class="callout">
+    <h3>Current Layout</h3>
+    <ul>
+      <li>Height: 110px</li>
+      <li>Icons: 44×44 + text labels</li>
+      <li>Labels help first-time users</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ARROW -->
+<div class="arrow-col">
+  <div class="arrow">&#10230;</div>
+  <div class="arrow-text">PROPOSED</div>
+</div>
+
+<!-- PROPOSED: Icons Only -->
+<div class="column">
+  <div class="label"><span>Proposed</span>Icons Only · No Text</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="content-area">
+      <div class="header-row">
+        <div>
+          <div class="greeting">Good morning Mom!</div>
+          <div class="subtitle">Ollie is 4 months</div>
+        </div>
+        <div class="baby-chip">Ollie &rsaquo;</div>
+      </div>
+      <div class="motivational">Every small moment matters</div>
+      <div class="summary-grid">
+        <div class="summary-card sc-feed"><div class="sc-icon">🍼</div><div class="sc-val">3</div><div class="sc-label">Feedings</div><div class="sc-sub">today</div></div>
+        <div class="summary-card sc-sleep"><div class="sc-icon">😴</div><div class="sc-val">2h 30m</div><div class="sc-label">Sleep</div><div class="sc-sub">today</div></div>
+        <div class="summary-card sc-pee"><div class="sc-icon">💧</div><div class="sc-val">4</div><div class="sc-label">Wet Diapers</div><div class="sc-sub">today</div></div>
+        <div class="summary-card sc-poop"><div class="sc-icon">💩</div><div class="sc-val">1</div><div class="sc-label">Dirty Diapers</div><div class="sc-sub">today</div></div>
+      </div>
+      <div class="happiness">
+        <div class="h-title">How's Ollie's day?</div>
+        <div class="h-row">
+          <div class="h-item"><div class="h-emoji" style="opacity:0.4">😢</div><div class="h-label">Tough</div></div>
+          <div class="h-item"><div class="h-emoji" style="opacity:0.4">😟</div><div class="h-label">Hard</div></div>
+          <div class="h-item"><div class="h-emoji" style="opacity:0.4">😐</div><div class="h-label">Okay</div></div>
+          <div class="h-item selected"><div class="h-emoji">🙂</div><div class="h-label" style="color:#7B5BD4">Good</div></div>
+          <div class="h-item"><div class="h-emoji" style="opacity:0.4">😄</div><div class="h-label">Great</div></div>
+        </div>
+      </div>
+      <div class="section-title">Log Activity</div>
+      <div class="activity-grid">
+        <div class="activity-card ac-feed"><div class="ac-icon">🍼</div><div class="ac-label">Feeding</div><div class="ac-sub">Breast / Bottle</div></div>
+        <div class="activity-card ac-sleep"><div class="ac-icon">😴</div><div class="ac-label">Sleep</div><div class="ac-sub">Nap / Night</div></div>
+        <div class="activity-card ac-pee"><div class="ac-icon">💧</div><div class="ac-label">Pee</div><div class="ac-sub">Wet diaper</div></div>
+        <div class="activity-card ac-poop"><div class="ac-icon">💩</div><div class="ac-label">Poop</div><div class="ac-sub">Dirty diaper</div></div>
+      </div>
+    </div>
+    <div class="bottom-bar-proposed">
+      <div class="tab active"><div class="icon">🏠</div></div>
+      <div class="tab"><div class="icon">📋</div></div>
+      <div class="tab"><div class="icon">📊</div></div>
+      <div class="tab"><div class="icon">⋯</div></div>
+    </div>
+  </div>
+  <div class="callout">
+    <h3>Proposed Layout</h3>
+    <ul>
+      <li class="pro">Height: 80px — saves 30px for content</li>
+      <li class="pro">Cleaner, more minimal look</li>
+      <li class="pro">Icons fill the available space</li>
+      <li class="pro">Active tab highlighted with background pill</li>
+      <li class="con">No text labels — relies on icon recognition</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

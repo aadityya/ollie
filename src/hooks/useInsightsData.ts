@@ -85,7 +85,32 @@ export function useInsightsData(babyId: string | null, range: InsightRange) {
       });
     }
 
-    setData(summaries);
+    // Group by week for month view
+    if (range === 'month') {
+      const weeks: DaySummary[] = [];
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      for (let w = 0; w < summaries.length; w += 7) {
+        const chunk = summaries.slice(w, w + 7);
+        const first = new Date(chunk[0].date);
+        const weekLabel = `${monthNames[first.getMonth()]} ${first.getDate()}`;
+        weeks.push({
+          date: chunk[0].date,
+          label: weekLabel,
+          feedCount: chunk.reduce((s, d) => s + d.feedCount, 0),
+          peeCount: chunk.reduce((s, d) => s + d.peeCount, 0),
+          poopCount: chunk.reduce((s, d) => s + d.poopCount, 0),
+          sleepMinutes: chunk.reduce((s, d) => s + d.sleepMinutes, 0),
+          colicCount: chunk.reduce((s, d) => s + d.colicCount, 0),
+          happinessScore: (() => {
+            const scores = chunk.map((d) => d.happinessScore).filter((s): s is number => s !== null);
+            return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+          })(),
+        });
+      }
+      setData(weeks);
+    } else {
+      setData(summaries);
+    }
     setIsLoading(false);
   }, [babyId, range]);
 

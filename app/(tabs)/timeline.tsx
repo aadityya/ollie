@@ -60,7 +60,10 @@ export default function TimelineScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <ScreenHeader title="Timeline" subtitle={`${babyName}'s day at a glance`} rightElement={<BabySwitcher compact />} />
+        <ScreenHeader title="Timeline" subtitle={`${babyName}'s day at a glance`} />
+        <View style={styles.badgeWrap}>
+          <BabySwitcher />
+        </View>
 
         <DatePicker
           date={selectedDate}
@@ -101,6 +104,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   container: { flex: 1 },
   content: { padding: 20, paddingTop: 16, paddingBottom: 40 },
+  badgeWrap: { marginTop: 4, marginBottom: 16 },
   group: { marginBottom: 20 },
   groupLabel: {
     fontSize: 14,

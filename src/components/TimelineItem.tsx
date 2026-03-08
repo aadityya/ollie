@@ -27,7 +27,7 @@ export function TimelineItem({ activity, onDelete }: TimelineItemProps) {
   return (
     <View style={[styles.container, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm, shadowColor: ollie.shadow }]}>
       <View style={[styles.icon, { backgroundColor: colors.bg, borderRadius: 12 }]}>
-        <Icon width={40} height={40} />
+        <Icon width={48} height={48} />
       </View>
       <View style={styles.info}>
         <Text style={[styles.title, { color: ollie.textPrimary }]}>
@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
   },

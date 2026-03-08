@@ -7,6 +7,8 @@ import { useAppTheme } from '@/src/theme';
 import { Timer } from '@/src/components/Timer';
 import { SegmentedControl } from '@/src/components/SegmentedControl';
 import { OptionSelector } from '@/src/components/OptionSelector';
+import { DateField } from '@/src/components/DateField';
+import { TimeField } from '@/src/components/TimeField';
 import { useTimer } from '@/src/hooks/useTimer';
 import { useActivityStore } from '@/src/stores/useActivityStore';
 import { useBabyStore } from '@/src/stores/useBabyStore';
@@ -338,14 +340,7 @@ export default function ActivityFormScreen() {
             </Pressable>
           </View>
           {showDateInput && (
-            <TextInput
-              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bgCard, marginTop: 10 }]}
-              value={activityDate}
-              onChangeText={setActivityDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={ollie.textLight}
-              keyboardType="numbers-and-punctuation"
-            />
+            <DateField value={activityDate} onChange={setActivityDate} maximumDate={new Date()} />
           )}
         </View>
 
@@ -381,27 +376,11 @@ export default function ActivityFormScreen() {
             <Text style={[styles.fieldLabel, { color: ollie.textSecondary }]}>Start & End Time</Text>
             <View style={styles.timeRow}>
               <View style={styles.timeField}>
-                <Text style={[styles.timeLabel, { color: ollie.textLight }]}>Start</Text>
-                <TextInput
-                  style={[styles.input, styles.timeInput, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bgCard }]}
-                  value={manualStartTime}
-                  onChangeText={setManualStartTime}
-                  placeholder="HH:MM"
-                  placeholderTextColor={ollie.textLight}
-                  keyboardType="numbers-and-punctuation"
-                />
+                <TimeField value={manualStartTime} onChange={setManualStartTime} label="Start" />
               </View>
               <Text style={[styles.timeSeparator, { color: ollie.textLight }]}>to</Text>
               <View style={styles.timeField}>
-                <Text style={[styles.timeLabel, { color: ollie.textLight }]}>End</Text>
-                <TextInput
-                  style={[styles.input, styles.timeInput, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bgCard }]}
-                  value={manualEndTime}
-                  onChangeText={setManualEndTime}
-                  placeholder="HH:MM"
-                  placeholderTextColor={ollie.textLight}
-                  keyboardType="numbers-and-punctuation"
-                />
+                <TimeField value={manualEndTime} onChange={setManualEndTime} label="End" />
               </View>
             </View>
           </View>

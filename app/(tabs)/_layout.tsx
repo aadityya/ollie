@@ -29,9 +29,9 @@ export default function TabLayout() {
           backgroundColor: ollie.navBg,
           borderTopColor: ollie.border,
           borderTopWidth: 1,
-          height: 100,
-          paddingBottom: 20,
-          paddingTop: 8,
+          height: 90,
+          paddingBottom: 8,
+          paddingTop: 12,
         },
         tabBarShowLabel: false,
       }}
@@ -96,8 +96,9 @@ const styles = StyleSheet.create({
   tabIcon: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 72,
-    height: 72,
-    borderRadius: 18,
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    overflow: 'hidden',
   },
 });

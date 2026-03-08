@@ -29,8 +29,8 @@ export default function InsightsScreen() {
     }, [refresh])
   );
 
-  const barWidth = range === 'day' ? 60 : range === 'week' ? 24 : 6;
-  const spacing = range === 'day' ? 20 : range === 'week' ? 14 : 3;
+  const barWidth = range === 'day' ? 60 : range === 'week' ? 24 : 40;
+  const spacing = range === 'day' ? 20 : range === 'week' ? 14 : 16;
 
   const feedData = data.map((d) => ({
     value: d.feedCount,
@@ -75,10 +75,10 @@ export default function InsightsScreen() {
     roundedBottom: true as const,
     yAxisThickness: 0,
     xAxisThickness: 0,
-    xAxisLabelTextStyle: { color: ollie.textLight, fontSize: range === 'month' ? 9 : 11, fontFamily: 'Nunito_600SemiBold' },
+    xAxisLabelTextStyle: { color: ollie.textLight, fontSize: 11, fontFamily: 'Nunito_600SemiBold' },
     yAxisTextStyle: { color: ollie.textLight, fontSize: 11 },
     hideRules: true,
-    barBorderRadius: range === 'month' ? 3 : 6,
+    barBorderRadius: 6,
     isAnimated: true,
     height: 120,
   };
@@ -90,7 +90,10 @@ export default function InsightsScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <ScreenHeader title="Insights" subtitle={baby?.name ? `${baby.name}'s trends` : 'Activity trends'} rightElement={<BabySwitcher compact />} />
+        <ScreenHeader title="Insights" subtitle={baby?.name ? `${baby.name}'s trends` : 'Activity trends'} />
+        <View style={styles.badgeWrap}>
+          <BabySwitcher />
+        </View>
 
         {/* Range Selector */}
         <View style={styles.rangeRow}>
@@ -161,17 +164,17 @@ export default function InsightsScreen() {
         <View style={[styles.chartCard, { backgroundColor: ollie.bgCard, borderRadius: ollie.radius }]}>
           <Text style={[styles.chartTitle, { color: ollie.textPrimary }]}>Happiness</Text>
           <View style={styles.happinessLegend}>
-            {['😢', '😟', '😐', '🙂', '😄'].map((e, i) => (
-              <Text key={i} style={styles.legendEmoji}>{e}</Text>
-            ))}
+            <Text style={[styles.legendLabel, { color: ollie.textLight }]}>Hard</Text>
+            <Text style={[styles.legendLabel, { color: ollie.textLight }]}>Okay</Text>
+            <Text style={[styles.legendLabel, { color: ollie.textLight }]}>Great</Text>
           </View>
           {happinessData.length > 0 && (
             <BarChart
               data={happinessData}
               {...chartProps}
-              noOfSections={5}
+              noOfSections={3}
               maxValue={5}
-              stepValue={1}
+              stepValue={2}
             />
           )}
         </View>
@@ -184,6 +187,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   container: { flex: 1 },
   content: { padding: 20, paddingTop: 16, paddingBottom: 40 },
+  badgeWrap: { marginTop: 4, marginBottom: 16 },
   rangeRow: {
     flexDirection: 'row',
     gap: 10,
@@ -213,7 +217,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     marginBottom: 8,
   },
-  legendEmoji: {
-    fontSize: 14,
+  legendLabel: {
+    fontSize: 12,
+    fontFamily: 'Nunito_600SemiBold',
   },
 });

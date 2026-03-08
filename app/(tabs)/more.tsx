@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -20,7 +20,10 @@ export default function MoreScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <ScreenHeader title="More" rightElement={<BabySwitcher compact />} />
+        <ScreenHeader title="More" />
+        <View style={styles.badgeWrap}>
+          <BabySwitcher />
+        </View>
 
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>TRACKING</Text>
         <SettingsItem
@@ -62,6 +65,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   container: { flex: 1 },
   content: { padding: 20, paddingTop: 16 },
+  badgeWrap: { marginTop: 4, marginBottom: 16 },
   groupTitle: {
     fontSize: 12,
     fontFamily: 'Nunito_700Bold',

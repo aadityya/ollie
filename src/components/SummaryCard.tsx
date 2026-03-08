@@ -15,7 +15,7 @@ interface SummaryCardProps {
 export function SummaryCard({ icon: Icon, value, label, subtitle, backgroundColor, textColor }: SummaryCardProps) {
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Icon width={140} height={140} />
+      <Icon width={160} height={160} />
       <Text style={[styles.value, { color: '#000' }]}>{value}</Text>
       <Text style={[styles.label, { color: textColor }]}>{label}</Text>
       <Text style={[styles.subtitle, { color: textColor, opacity: 0.7 }]}>{subtitle}</Text>

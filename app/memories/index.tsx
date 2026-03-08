@@ -4,6 +4,7 @@ import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useAppTheme } from '@/src/theme';
+import { DateField } from '@/src/components/DateField';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { Memory } from '@/src/types';
 import * as memoryRepo from '@/src/db/repositories/memoryRepository';
@@ -103,11 +104,9 @@ export default function MemoriesScreen() {
               style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
               value={title} onChangeText={setTitle} placeholder="First smile, first word..." placeholderTextColor={ollie.textLight}
             />
-            <TextInput
-              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
-              value={date} onChangeText={setDate} placeholder="YYYY-MM-DD" placeholderTextColor={ollie.textLight}
-              keyboardType="numbers-and-punctuation"
-            />
+            <View style={{ marginBottom: 10 }}>
+              <DateField value={date} onChange={setDate} />
+            </View>
             <TextInput
               style={[styles.input, styles.textArea, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
               value={description} onChangeText={setDescription} placeholder="Describe this moment..." placeholderTextColor={ollie.textLight}

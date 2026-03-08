@@ -58,6 +58,9 @@ export default function HomeScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        {/* Dashboard */}
+        <Text style={[styles.sectionTitle, { color: ollie.textPrimary }]}>Dashboard</Text>
+
         {/* Baby Profile */}
         <View style={styles.profileSection}>
           <BabySwitcher />
@@ -67,7 +70,6 @@ export default function HomeScreen() {
           {getDailyPhrase(userName)}
         </Text>
 
-        {/* Summary Cards */}
         <View style={styles.summaryGrid}>
           <View style={styles.summaryRow}>
             <View style={styles.summaryCell}>
@@ -114,9 +116,6 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
-
-        {/* Happiness */}
-        <HappinessSlider babyId={baby?.id} date={todayDateStr()} babyName={baby?.name} />
 
         {/* Log Activity */}
         <Text style={[styles.sectionTitle, { color: ollie.textPrimary }]}>Log Activity</Text>
@@ -197,6 +196,9 @@ export default function HomeScreen() {
             </View>
           </>
         )}
+
+        {/* Before you go to bed */}
+        <HappinessSlider babyId={baby?.id} date={todayDateStr()} babyName={baby?.name} />
 
         {/* Last Activity */}
         <Text style={[styles.sectionTitle, { color: ollie.textPrimary, marginTop: 24 }]}>

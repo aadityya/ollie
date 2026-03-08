@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { ScrollView, View, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { ScrollView, View, StyleSheet, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LineChart } from 'react-native-gifted-charts';
+import { DateField } from '@/src/components/DateField';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import * as growthRepo from '@/src/db/repositories/growthRepository';
@@ -29,6 +30,7 @@ export default function MeasurementsScreen() {
   const [value, setValue] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [saving, setSaving] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
 
   const loadRecords = useCallback(async () => {
     if (!baby?.id) return;
@@ -100,7 +102,12 @@ export default function MeasurementsScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: ollie.bg }]}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
@@ -229,14 +236,9 @@ export default function MeasurementsScreen() {
               placeholderTextColor={ollie.textLight}
               keyboardType="decimal-pad"
               autoFocus
+              onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
             />
-            <TextInput
-              style={[styles.input, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
-              value={date}
-              onChangeText={setDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={ollie.textLight}
-            />
+            <DateField value={date} onChange={setDate} maximumDate={new Date()} />
             <View style={styles.formButtons}>
               <Pressable
                 style={[styles.formBtn, { backgroundColor: ollie.bgSecondary }]}
@@ -263,12 +265,14 @@ export default function MeasurementsScreen() {
           </Pressable>
         )}
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
+  flex: { flex: 1 },
   scroll: { flex: 1 },
   content: { padding: 20, paddingBottom: 40 },
   backBtn: { marginBottom: 8 },
