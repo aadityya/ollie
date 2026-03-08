@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home Screen Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #e8e0d8; font-family: 'Nunito', sans-serif; padding: 20px; display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+
+  .phone {
+    width: 375px;
+    min-height: 780px;
+    background: #FFF8F2;
+    border-radius: 40px;
+    border: 8px solid #222;
+    overflow: hidden;
+    padding: 20px 16px;
+  }
+  .phone-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #bbb;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 1.5px;
+  }
+
+  /* Baby profile section */
+  .profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .profile-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    width: 100%;
+  }
+  .profile-name {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+  .profile-switch {
+    font-size: 14px;
+    font-weight: 700;
+    color: #E88A6A;
+  }
+  .profile-age {
+    font-size: 14px;
+    font-weight: 600;
+    color: #999;
+    margin-top: 6px;
+  }
+
+  /* Motivational */
+  .motivational {
+    font-size: 13px;
+    font-style: italic;
+    text-align: center;
+    color: #bbb;
+    margin-bottom: 20px;
+    margin-top: -2px;
+  }
+
+  /* Summary cards */
+  .summary-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .summary-row { display: flex; gap: 12px; }
+  .summary-card {
+    flex: 1;
+    border-radius: 15px;
+    padding: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .summary-card img { width: 96px; height: 96px; }
+  .summary-card .value { font-size: 15px; font-weight: 800; }
+  .summary-card .label { font-size: 9px; font-weight: 600; opacity: 0.7; }
+  .summary-card .sub { font-size: 8px; opacity: 0.5; }
+
+  /* Mood */
+  .mood-card {
+    background: white;
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 20px;
+  }
+  .mood-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
+  .mood-row { display: flex; justify-content: space-between; }
+  .mood-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+  }
+  .mood-item.selected { background: #E8F4FD; border-radius: 10px; }
+  .mood-item img { width: 36px; height: 36px; }
+  .mood-item .label { font-size: 10px; font-weight: 600; color: #999; }
+  .mood-item.selected .label { color: #5BA4D9; }
+  .mood-item:not(.selected) img { opacity: 0.4; }
+
+  /* Section title */
+  .section-title { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; }
+  .group-title { font-size: 12px; font-weight: 700; color: #999; letter-spacing: 1px; margin-bottom: 8px; margin-top: 16px; }
+
+  /* Activity grid */
+  .activity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .activity-card {
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .activity-card img { width: 80px; height: 80px; }
+  .activity-card .label { font-size: 11px; font-weight: 700; }
+
+  /* Timeline */
+  .timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0e8df;
+  }
+  .timeline-badge {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .timeline-badge img { width: 40px; height: 40px; }
+  .timeline-text { flex: 1; }
+  .timeline-text .name { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+  .timeline-text .time { font-size: 11px; color: #999; }
+
+  /* Tab bar */
+  .tab-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #FFF8F2;
+    border-top: 1px solid #f0e8df;
+    padding: 8px 0;
+    margin-top: auto;
+  }
+  .tab-icon {
+    width: 52px; height: 52px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 14px;
+  }
+  .tab-icon.active { background: #FFF0E5; }
+  .tab-icon img { width: 44px; height: 44px; }
+
+  /* Settings */
+  .settings-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: white; margin-bottom: 1px;
+  }
+  .settings-item img { width: 28px; height: 28px; }
+  .settings-item .label { flex: 1; font-size: 15px; font-weight: 600; color: #1a1a2e; }
+  .settings-item .arrow { color: #ccc; font-size: 18px; }
+</style>
+</head>
+<body>
+
+<!-- Phone 1: Home Screen (Updated) -->
+<div class="phone">
+  <div class="phone-label">HOME</div>
+
+  <!-- Baby Profile (first thing, larger) -->
+  <div class="profile-section">
+    <div class="profile-card">
+      <span class="profile-name">Emma</span>
+      <span class="profile-switch">Switch</span>
+    </div>
+  </div>
+
+  <div class="motivational">Aditya, you're doing an amazing job!</div>
+
+  <!-- Summary Cards with larger icons -->
+  <div class="summary-grid">
+    <div class="summary-row">
+      <div class="summary-card" style="background: #FFF0E5;">
+        <img src="../assets/icons/feed-milk.svg">
+        <div class="value" style="color: #E8855A;">5</div>
+        <div class="label" style="color: #E8855A;">Feedings</div>
+        <div class="sub" style="color: #E8855A;">today</div>
+      </div>
+      <div class="summary-card" style="background: #E8F4FD;">
+        <img src="../assets/icons/sleep.svg">
+        <div class="value" style="color: #5BA4D9;">3h 20m</div>
+        <div class="label" style="color: #5BA4D9;">Sleep</div>
+        <div class="sub" style="color: #5BA4D9;">today</div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-card" style="background: #FFF9E6;">
+        <img src="../assets/icons/pee.svg">
+        <div class="value" style="color: #E8B84A;">4</div>
+        <div class="label" style="color: #E8B84A;">Wet Diapers</div>
+        <div class="sub" style="color: #E8B84A;">today</div>
+      </div>
+      <div class="summary-card" style="background: #F0EDE6;">
+        <img src="../assets/icons/poop.svg">
+        <div class="value" style="color: #8B7355;">2</div>
+        <div class="label" style="color: #8B7355;">Dirty Diapers</div>
+        <div class="sub" style="color: #8B7355;">today</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mood -->
+  <div class="mood-card">
+    <div class="mood-title">How's Emma's day?</div>
+    <div class="mood-row">
+      <div class="mood-item"><img src="../assets/icons/mood-distressed.svg"><span class="label">Tough</span></div>
+      <div class="mood-item"><img src="../assets/icons/mood-fussy.svg"><span class="label">Hard</span></div>
+      <div class="mood-item"><img src="../assets/icons/mood-calm.svg"><span class="label">Okay</span></div>
+      <div class="mood-item selected"><img src="../assets/icons/mood-content.svg"><span class="label">Good</span></div>
+      <div class="mood-item"><img src="../assets/icons/mood-happy.svg"><span class="label">Great</span></div>
+    </div>
+  </div>
+
+  <!-- Log Activity -->
+  <div class="section-title">Log Activity</div>
+  <div class="activity-grid">
+    <div class="activity-card" style="background: #FFF0E5;">
+      <img src="../assets/icons/feed-milk.svg">
+      <span class="label" style="color: #E8855A;">Feed</span>
+    </div>
+    <div class="activity-card" style="background: #E8F4FD;">
+      <img src="../assets/icons/sleep.svg">
+      <span class="label" style="color: #5BA4D9;">Sleep</span>
+    </div>
+    <div class="activity-card" style="background: #FFF9E6;">
+      <img src="../assets/icons/pee.svg">
+      <span class="label" style="color: #E8B84A;">Pee</span>
+    </div>
+    <div class="activity-card" style="background: #F0EDE6;">
+      <img src="../assets/icons/poop.svg">
+      <span class="label" style="color: #8B7355;">Poop</span>
+    </div>
+  </div>
+</div>
+
+<!-- Phone 2: Timeline + More + Tab Bar -->
+<div class="phone" style="display: flex; flex-direction: column;">
+  <div class="phone-label">TIMELINE & MORE</div>
+  <div class="section-title">Timeline</div>
+
+  <div class="timeline-item">
+    <div class="timeline-badge" style="background: #FFF0E5;"><img src="../assets/icons/feed-milk.svg"></div>
+    <div class="timeline-text"><div class="name">Feeding - Bottle</div><div class="time">2:30 PM · 120ml</div></div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-badge" style="background: #E8F4FD;"><img src="../assets/icons/sleep.svg"></div>
+    <div class="timeline-text"><div class="name">Sleep - Nap</div><div class="time">1:00 PM · 45 min</div></div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-badge" style="background: #FFF9E6;"><img src="../assets/icons/pee.svg"></div>
+    <div class="timeline-text"><div class="name">Wet Diaper</div><div class="time">12:15 PM · Normal</div></div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-badge" style="background: #E6F9ED;"><img src="../assets/icons/tummy-time.svg"></div>
+    <div class="timeline-text"><div class="name">Tummy Time</div><div class="time">11:00 AM · 15 min</div></div>
+  </div>
+
+  <div style="margin-top: 24px;">
+    <div class="group-title">TRACKING</div>
+    <div class="settings-item" style="border-radius: 12px 12px 0 0;">
+      <img src="../assets/icons/measurements.svg"><span class="label">Measurements</span><span class="arrow">›</span>
+    </div>
+    <div class="settings-item">
+      <img src="../assets/icons/appointments.svg"><span class="label">Appointments</span><span class="arrow">›</span>
+    </div>
+    <div class="settings-item">
+      <img src="../assets/icons/memories.svg"><span class="label">Memories</span><span class="arrow">›</span>
+    </div>
+    <div class="settings-item" style="border-radius: 0 0 12px 12px;">
+      <img src="../assets/icons/medications.svg"><span class="label">Medications</span><span class="arrow">›</span>
+    </div>
+  </div>
+
+  <div style="flex: 1;"></div>
+  <div class="tab-bar">
+    <div class="tab-icon active"><img src="../assets/icons/home.svg"></div>
+    <div class="tab-icon"><img src="../assets/icons/log.svg"></div>
+    <div class="tab-icon"><img src="../assets/icons/insights.svg"></div>
+    <div class="tab-icon"><img src="../assets/icons/more-options.svg"></div>
+  </div>
+</div>
+
+</body>
+</html>

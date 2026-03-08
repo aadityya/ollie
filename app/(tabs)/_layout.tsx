@@ -13,7 +13,7 @@ interface TabIconProps {
 function TabIcon({ icon: Icon, focused, activeBg }: TabIconProps) {
   return (
     <View style={[styles.tabIcon, focused && { backgroundColor: activeBg }]}>
-      <Icon width={108} height={108} style={{ opacity: focused ? 1 : 0.45 }} />
+      <Icon width={64} height={64} />
     </View>
   );
 }
@@ -29,8 +29,8 @@ export default function TabLayout() {
           backgroundColor: ollie.navBg,
           borderTopColor: ollie.border,
           borderTopWidth: 1,
-          height: 148,
-          paddingBottom: 26,
+          height: 100,
+          paddingBottom: 20,
           paddingTop: 8,
         },
         tabBarShowLabel: false,
@@ -96,8 +96,8 @@ const styles = StyleSheet.create({
   tabIcon: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 108,
-    height: 108,
-    borderRadius: 24,
+    width: 72,
+    height: 72,
+    borderRadius: 18,
   },
 });

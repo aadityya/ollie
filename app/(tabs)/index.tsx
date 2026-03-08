@@ -3,7 +3,6 @@ import { ScrollView, View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { SummaryCard } from '@/src/components/SummaryCard';
 import { ActivityCard } from '@/src/components/ActivityCard';
 import { TimelineItem } from '@/src/components/TimelineItem';
@@ -14,7 +13,7 @@ import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { useTodaySummary } from '@/src/hooks/useTodaySummary';
-import { getGreeting, calculateAge, formatTimeAgo, todayDateStr } from '@/src/utils/dateHelpers';
+import { formatTimeAgo, todayDateStr } from '@/src/utils/dateHelpers';
 import { activityMeta, getMetaForType } from '@/src/utils/activityHelpers';
 import { formatDuration } from '@/src/utils/dateHelpers';
 import { getDailyPhrase } from '@/src/constants/motivationalPhrases';
@@ -27,8 +26,6 @@ export default function HomeScreen() {
   const baby = useBabyStore((s) => s.activeBaby);
   const userName = useSettingsStore((s) => s.userName);
   const customActivityTypes = useSettingsStore((s) => s.customActivityTypes);
-  const babyName = baby?.name ?? 'your baby';
-  const age = baby?.dateOfBirth ? calculateAge(baby.dateOfBirth) : '';
 
   const { summary, refresh } = useTodaySummary(baby?.id ?? null);
 
@@ -61,14 +58,13 @@ export default function HomeScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <ScreenHeader
-          title={`${getGreeting()} ${userName}!`}
-          subtitle={`${babyName} is ${age}`}
-          rightElement={<BabySwitcher compact />}
-        />
+        {/* Baby Profile */}
+        <View style={styles.profileSection}>
+          <BabySwitcher />
+        </View>
 
         <Text style={[styles.motivational, { color: ollie.textLight }]}>
-          {getDailyPhrase()}
+          {getDailyPhrase(userName)}
         </Text>
 
         {/* Summary Cards */}
@@ -229,6 +225,10 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   container: { flex: 1 },
   content: { padding: 20, paddingTop: 16, paddingBottom: 40 },
+  profileSection: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   motivational: {
     fontSize: 13,
     fontStyle: 'italic',
