@@ -1,10 +1,11 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Text, StyleSheet, View } from 'react-native';
+import { Text, StyleSheet, View, Image, ImageSourcePropType } from 'react-native';
 import { useAppTheme } from '@/src/theme';
+import { AppIcons } from '@/src/constants/icons';
 
 interface TabIconProps {
-  icon: string;
+  icon: string | ImageSourcePropType;
   label: string;
   focused: boolean;
   activeColor: string;
@@ -15,7 +16,11 @@ function TabIcon({ icon, label, focused, activeColor, inactiveColor }: TabIconPr
   const color = focused ? activeColor : inactiveColor;
   return (
     <View style={styles.tabIcon}>
-      <Text style={[styles.icon, { color }]}>{icon}</Text>
+      {typeof icon === 'string' ? (
+        <Text style={[styles.emojiIcon, { color }]}>{icon}</Text>
+      ) : (
+        <Image source={icon} style={[styles.imgIcon, { opacity: focused ? 1 : 0.5 }]} resizeMode="contain" />
+      )}
       <Text style={[styles.label, { color, fontFamily: 'Nunito_600SemiBold' }]}>{label}</Text>
     </View>
   );
@@ -72,7 +77,7 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon
-              icon="📋"
+              icon={AppIcons.log}
               label="Timeline"
               focused={focused}
               activeColor={ollie.navActive}
@@ -86,7 +91,7 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon
-              icon="⭐"
+              icon={AppIcons.milestones}
               label="Milestones"
               focused={focused}
               activeColor={ollie.navActive}
@@ -100,7 +105,7 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon
-              icon="⚙️"
+              icon={AppIcons.settings}
               label="Settings"
               focused={focused}
               activeColor={ollie.navActive}
@@ -118,9 +123,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  icon: {
+  emojiIcon: {
     fontSize: 22,
     lineHeight: 26,
+  },
+  imgIcon: {
+    width: 26,
+    height: 26,
   },
   label: {
     fontSize: 10,

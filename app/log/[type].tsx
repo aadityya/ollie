@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Pressable, TextInput, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Pressable, TextInput, Alert, Image } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -245,7 +245,7 @@ export default function ActivityFormScreen() {
         </Pressable>
 
         <View style={[styles.header, { backgroundColor: colors.bg }]}>
-          <Text style={styles.headerIcon}>{meta?.icon ?? '?'}</Text>
+          {meta?.icon && <Image source={meta.icon} style={styles.headerIcon} resizeMode="contain" />}
           <Text style={[styles.headerTitle, { color: colors.color }]}>
             {titles[activityType] ?? 'Log Activity'}
           </Text>
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  headerIcon: { fontSize: 40 },
+  headerIcon: { width: 56, height: 56 },
   headerTitle: { fontSize: 20, fontFamily: 'Nunito_800ExtraBold' },
   section: { marginTop: 20 },
   fieldLabel: {

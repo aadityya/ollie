@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useAppTheme } from '@/src/theme';
 import { Activity } from '@/src/types';
@@ -18,7 +18,7 @@ export function TimelineItem({ activity }: TimelineItemProps) {
   return (
     <View style={[styles.container, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm, shadowColor: ollie.shadow }]}>
       <View style={[styles.icon, { backgroundColor: colors.bg, borderRadius: 12 }]}>
-        <Text style={styles.iconText}>{meta.icon}</Text>
+        <Image source={meta.icon} style={styles.iconImg} resizeMode="contain" />
       </View>
       <View style={styles.info}>
         <Text style={[styles.title, { color: ollie.textPrimary }]}>
@@ -53,8 +53,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconText: {
-    fontSize: 20,
+  iconImg: {
+    width: 28,
+    height: 28,
   },
   info: {
     flex: 1,

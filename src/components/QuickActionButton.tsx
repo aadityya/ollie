@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Pressable } from 'react-native';
+import { StyleSheet, Pressable, Image, ImageSourcePropType } from 'react-native';
 import { Text } from 'react-native-paper';
 
 interface QuickActionButtonProps {
-  icon: string;
+  icon: ImageSourcePropType;
   label: string;
   bgColor: string;
   textColor: string;
@@ -16,7 +16,7 @@ export function QuickActionButton({ icon, label, bgColor, textColor, onPress }: 
       style={[styles.container, { backgroundColor: bgColor }]}
       onPress={onPress}
     >
-      <Text style={styles.icon}>{icon}</Text>
+      <Image source={icon} style={styles.icon} resizeMode="contain" />
       <Text style={[styles.label, { color: textColor }]}>{label}</Text>
     </Pressable>
   );
@@ -32,7 +32,8 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   icon: {
-    fontSize: 26,
+    width: 36,
+    height: 36,
   },
   label: {
     fontSize: 11,

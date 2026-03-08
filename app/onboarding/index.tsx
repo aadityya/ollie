@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, Pressable, TextInput, KeyboardAvoidingView, Platform, Image, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
+import { WelcomeBg } from '@/src/constants/icons';
 
 export default function OnboardingScreen() {
   const { ollie } = useAppTheme();
@@ -38,8 +39,12 @@ export default function OnboardingScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.flex}
       >
-        <View style={styles.content}>
-          <Text style={styles.emoji}>👶</Text>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Image source={WelcomeBg} style={styles.heroImage} resizeMode="contain" />
           <Text style={[styles.title, { color: ollie.textPrimary }]}>
             Welcome to Ollie
           </Text>
@@ -81,7 +86,7 @@ export default function OnboardingScreen() {
               {saving ? 'Setting up...' : "Let's Go!"}
             </Text>
           </Pressable>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -90,14 +95,15 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   flex: { flex: 1 },
-  content: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     padding: 24,
     justifyContent: 'center',
   },
-  emoji: {
-    fontSize: 64,
-    textAlign: 'center',
+  heroImage: {
+    width: '100%',
+    height: 260,
+    alignSelf: 'center',
     marginBottom: 16,
   },
   title: {
@@ -109,7 +115,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 32,
   },
   form: {
     marginBottom: 32,

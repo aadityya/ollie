@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet, ImageSourcePropType } from 'react-native';
 import { Text } from 'react-native-paper';
 
 interface SummaryCardProps {
-  icon: string;
+  icon: ImageSourcePropType;
   value: string;
   label: string;
   subtitle: string;
@@ -14,7 +14,7 @@ interface SummaryCardProps {
 export function SummaryCard({ icon, value, label, subtitle, backgroundColor, textColor }: SummaryCardProps) {
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Text style={styles.icon}>{icon}</Text>
+      <Image source={icon} style={styles.icon} resizeMode="contain" />
       <Text style={[styles.value, { color: '#000' }]}>{value}</Text>
       <Text style={[styles.label, { color: textColor }]}>{label}</Text>
       <Text style={[styles.subtitle, { color: textColor, opacity: 0.7 }]}>{subtitle}</Text>
@@ -29,7 +29,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   icon: {
-    fontSize: 24,
+    width: 32,
+    height: 32,
   },
   value: {
     fontSize: 22,

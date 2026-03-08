@@ -1,7 +1,9 @@
+import { ImageSourcePropType } from 'react-native';
 import { ActivityType, OlliePalette, ActivityColorSet } from '@/src/types';
+import { AppIcons } from '@/src/constants/icons';
 
 interface ActivityMeta {
-  icon: string;
+  icon: ImageSourcePropType;
   label: string;
   subtitle: string;
   getColors: (palette: OlliePalette) => ActivityColorSet;
@@ -9,31 +11,31 @@ interface ActivityMeta {
 
 export const activityMeta: Record<ActivityType, ActivityMeta> = {
   feed: {
-    icon: '🍼',
+    icon: AppIcons.feed,
     label: 'Feeding',
     subtitle: 'Breast / Bottle',
     getColors: (p) => p.feed,
   },
   sleep: {
-    icon: '😴',
+    icon: AppIcons.sleep,
     label: 'Sleep',
     subtitle: 'Nap / Night',
     getColors: (p) => p.sleep,
   },
   pee: {
-    icon: '💧',
+    icon: AppIcons.pee,
     label: 'Pee',
     subtitle: 'Wet diaper',
     getColors: (p) => p.pee,
   },
   poop: {
-    icon: '💩',
+    icon: AppIcons.poop,
     label: 'Poop',
     subtitle: 'Dirty diaper',
     getColors: (p) => p.poop,
   },
   colic: {
-    icon: '😢',
+    icon: AppIcons.colic,
     label: 'Colic',
     subtitle: 'Crying / Discomfort',
     getColors: (p) => p.colic,

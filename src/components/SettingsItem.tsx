@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable, Image, ImageSourcePropType } from 'react-native';
 import { Text, Switch } from 'react-native-paper';
 import { useAppTheme } from '@/src/theme';
 
 interface SettingsItemProps {
-  icon: string;
+  icon: string | ImageSourcePropType;
   label: string;
   type?: 'arrow' | 'toggle';
   value?: boolean;
@@ -45,7 +45,11 @@ export function SettingsItem({
         borderRadiusStyle,
       ]}
     >
-      <Text style={styles.icon}>{icon}</Text>
+      {typeof icon === 'string' ? (
+        <Text style={styles.iconEmoji}>{icon}</Text>
+      ) : (
+        <Image source={icon} style={styles.iconImg} resizeMode="contain" />
+      )}
       <Text
         style={[styles.label, { color: ollie.textPrimary, fontFamily: 'Nunito_600SemiBold' }]}
       >
@@ -74,8 +78,12 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     marginBottom: 1,
   },
-  icon: {
+  iconEmoji: {
     fontSize: 22,
+  },
+  iconImg: {
+    width: 28,
+    height: 28,
   },
   label: {
     flex: 1,

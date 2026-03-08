@@ -16,6 +16,7 @@ import { getGreeting, calculateAge, formatTimeAgo } from '@/src/utils/dateHelper
 import { activityMeta } from '@/src/utils/activityHelpers';
 import { formatDuration } from '@/src/utils/dateHelpers';
 import { ActivityType } from '@/src/types';
+import { AppIcons } from '@/src/constants/icons';
 
 export default function HomeScreen() {
   const { ollie } = useAppTheme();
@@ -51,7 +52,7 @@ export default function HomeScreen() {
           <View style={styles.summaryRow}>
             <View style={styles.summaryCell}>
               <SummaryCard
-                icon="🍼"
+                icon={AppIcons.feed}
                 value={String(summary.feedCount)}
                 label="Feedings"
                 subtitle="today"
@@ -61,7 +62,7 @@ export default function HomeScreen() {
             </View>
             <View style={styles.summaryCell}>
               <SummaryCard
-                icon="😴"
+                icon={AppIcons.sleep}
                 value={summary.sleepMinutes > 0 ? formatDuration(summary.sleepMinutes * 60) : '0m'}
                 label="Sleep"
                 subtitle="today"
@@ -73,7 +74,7 @@ export default function HomeScreen() {
           <View style={styles.summaryRow}>
             <View style={styles.summaryCell}>
               <SummaryCard
-                icon="💧"
+                icon={AppIcons.pee}
                 value={String(summary.peeCount)}
                 label="Wet Diapers"
                 subtitle="today"
@@ -83,7 +84,7 @@ export default function HomeScreen() {
             </View>
             <View style={styles.summaryCell}>
               <SummaryCard
-                icon="💩"
+                icon={AppIcons.poop}
                 value={String(summary.poopCount)}
                 label="Dirty Diapers"
                 subtitle="today"

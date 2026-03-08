@@ -9,6 +9,7 @@ import { ThemeSelector } from '@/src/components/ThemeSelector';
 import { useAppTheme } from '@/src/theme';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { APP_VERSION } from '@/src/constants/version';
+import { AppIcons } from '@/src/constants/icons';
 
 export default function SettingsScreen() {
   const { ollie } = useAppTheme();
@@ -45,7 +46,7 @@ export default function SettingsScreen() {
         {/* Notifications */}
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>NOTIFICATIONS</Text>
         <SettingsItem
-          icon="🍼"
+          icon={AppIcons.feed}
           label="Feed Reminders"
           type="toggle"
           value={feedReminderEnabled}
@@ -53,7 +54,7 @@ export default function SettingsScreen() {
           isFirst
         />
         <SettingsItem
-          icon="😴"
+          icon={AppIcons.sleep}
           label="Nap Reminders"
           type="toggle"
           value={napReminderEnabled}

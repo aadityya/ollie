@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Pressable, View } from 'react-native';
+import { StyleSheet, Pressable, View, Image, ImageSourcePropType } from 'react-native';
 import { Text } from 'react-native-paper';
 
 interface ActivityCardProps {
-  icon: string;
+  icon: ImageSourcePropType;
   label: string;
   subtitle: string;
   bgColor: string;
@@ -19,7 +19,7 @@ export function ActivityCard({ icon, label, subtitle, bgColor, textColor, onPres
         style={[styles.containerFull, { backgroundColor: bgColor }]}
         onPress={onPress}
       >
-        <Text style={styles.iconFull}>{icon}</Text>
+        <Image source={icon} style={styles.iconFull} resizeMode="contain" />
         <View>
           <Text style={[styles.label, { color: textColor }]}>{label}</Text>
           <Text style={[styles.subtitle, { color: textColor, opacity: 0.7 }]}>{subtitle}</Text>
@@ -33,7 +33,7 @@ export function ActivityCard({ icon, label, subtitle, bgColor, textColor, onPres
       style={[styles.container, { backgroundColor: bgColor }]}
       onPress={onPress}
     >
-      <Text style={styles.icon}>{icon}</Text>
+      <Image source={icon} style={styles.icon} resizeMode="contain" />
       <Text style={[styles.label, { color: textColor }]}>{label}</Text>
       <Text style={[styles.subtitle, { color: textColor, opacity: 0.7 }]}>{subtitle}</Text>
     </Pressable>
@@ -65,10 +65,12 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   icon: {
-    fontSize: 40,
+    width: 56,
+    height: 56,
   },
   iconFull: {
-    fontSize: 32,
+    width: 40,
+    height: 40,
   },
   label: {
     fontSize: 15,
