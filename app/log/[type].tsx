@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, ScrollView, StyleSheet, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -97,6 +97,7 @@ export default function ActivityFormScreen() {
   // Colic state
   const [colicIntensity, setColicIntensity] = useState<ColicIntensity>('mild');
   const [colicWhatHelped, setColicWhatHelped] = useState('');
+  const scrollRef = useRef<ScrollView>(null);
 
   const handleSave = async () => {
     if (!babyId) return;
@@ -198,6 +199,7 @@ export default function ActivityFormScreen() {
             placeholder="120"
             placeholderTextColor={ollie.textLight}
             keyboardType="numeric"
+            onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
           />
         </View>
       )}
@@ -282,6 +284,7 @@ export default function ActivityFormScreen() {
           onChangeText={setColicWhatHelped}
           placeholder="Rocking, swaddling..."
           placeholderTextColor={ollie.textLight}
+          onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
         />
       </View>
     </View>
@@ -307,6 +310,7 @@ export default function ActivityFormScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
@@ -401,19 +405,22 @@ export default function ActivityFormScreen() {
             placeholderTextColor={ollie.textLight}
             multiline
             numberOfLines={3}
+            onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
           />
         </View>
 
+      </ScrollView>
+      <View style={[styles.bottomBar, { backgroundColor: ollie.bg }]}>
         <Pressable
           style={[styles.saveBtn, { backgroundColor: colors.color }]}
-          onPress={handleSave}
+          onPress={() => { Keyboard.dismiss(); handleSave(); }}
           disabled={saving}
         >
           <Text style={styles.saveBtnText}>
             {saving ? 'Saving...' : 'Save'}
           </Text>
         </Pressable>
-      </ScrollView>
+      </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -487,8 +494,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_700Bold',
     marginTop: 16,
   },
+  bottomBar: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingBottom: 20,
+  },
   saveBtn: {
-    marginTop: 28,
     paddingVertical: 16,
     borderRadius: 14,
     alignItems: 'center',

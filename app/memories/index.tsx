@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { ScrollView, View, StyleSheet, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { ScrollView, View, StyleSheet, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -100,7 +100,7 @@ export default function MemoriesScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: ollie.textSecondary }]}>{'< Back'}</Text>
+          <Text style={[styles.backText, { color: ollie.textSecondary }]}>{'Back'}</Text>
         </Pressable>
 
         <Text style={[styles.screenTitle, { color: ollie.textPrimary }]}>
@@ -155,18 +155,6 @@ export default function MemoriesScreen() {
               multiline numberOfLines={4}
               onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
             />
-            <View style={styles.formActions}>
-              <Pressable onPress={resetForm}>
-                <Text style={[styles.cancelBtn, { color: ollie.textSecondary }]}>Cancel</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.saveBtn, { backgroundColor: ollie.accent }]}
-                onPress={handleSave}
-                disabled={saving || !title.trim()}
-              >
-                <Text style={styles.saveBtnText}>{saving ? 'Saving...' : 'Save'}</Text>
-              </Pressable>
-            </View>
           </View>
         )}
 
@@ -179,6 +167,22 @@ export default function MemoriesScreen() {
           </Pressable>
         )}
       </ScrollView>
+      {showForm && (
+        <View style={[styles.bottomBar, { backgroundColor: ollie.bg }]}>
+          <View style={styles.formActions}>
+            <Pressable onPress={resetForm}>
+              <Text style={[styles.cancelBtn, { color: ollie.textSecondary }]}>Cancel</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.saveBtn, { backgroundColor: ollie.accent }]}
+              onPress={() => { Keyboard.dismiss(); handleSave(); }}
+              disabled={saving || !title.trim()}
+            >
+              <Text style={styles.saveBtnText}>{saving ? 'Saving...' : 'Save'}</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -206,7 +210,8 @@ const styles = StyleSheet.create({
   formTitle: { fontSize: 16, fontFamily: 'Nunito_700Bold', marginBottom: 12 },
   input: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, fontSize: 15, fontFamily: 'Nunito_400Regular', marginBottom: 10 },
   textArea: { minHeight: 80, textAlignVertical: 'top' },
-  formActions: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 16, marginTop: 8 },
+  bottomBar: { paddingHorizontal: 20, paddingVertical: 12, paddingBottom: 20 },
+  formActions: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 16 },
   cancelBtn: { fontSize: 15, fontFamily: 'Nunito_600SemiBold' },
   saveBtn: { paddingHorizontal: 24, paddingVertical: 10, borderRadius: 10 },
   saveBtnText: { color: '#FFFFFF', fontSize: 15, fontFamily: 'Nunito_700Bold' },

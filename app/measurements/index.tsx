@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ScrollView, View, StyleSheet, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { ScrollView, View, StyleSheet, Pressable, TextInput, Alert, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -9,7 +9,6 @@ import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
 import * as growthRepo from '@/src/db/repositories/growthRepository';
 import { GrowthRecord } from '@/src/types';
-import { calculatePercentile, getBabyAgeMonths } from '@/src/utils/growthPercentile';
 
 type MeasureType = 'weight' | 'height' | 'head';
 
@@ -133,14 +132,6 @@ export default function MeasurementsScreen() {
   const tabInfo = TABS.find((t) => t.key === activeTab)!;
   const latestVal = chartData.length > 0 ? chartData[chartData.length - 1].value : null;
 
-  const percentileText = (() => {
-    if (!latestVal || !baby?.gender || !baby?.dateOfBirth) return null;
-    if (activeTab !== 'weight' && activeTab !== 'height') return null;
-    const ageMonths = getBabyAgeMonths(baby.dateOfBirth);
-    if (ageMonths < 0 || ageMonths > 24) return null;
-    return calculatePercentile(latestVal, ageMonths, baby.gender, activeTab);
-  })();
-
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: ollie.bg }]}>
       <KeyboardAvoidingView
@@ -155,7 +146,7 @@ export default function MeasurementsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: ollie.textSecondary }]}>{'< Back'}</Text>
+          <Text style={[styles.backText, { color: ollie.textSecondary }]}>{'Back'}</Text>
         </Pressable>
 
         <Text style={[styles.title, { color: ollie.textPrimary }]}>
@@ -195,11 +186,6 @@ export default function MeasurementsScreen() {
             <Text style={[styles.currentValue, { color: ollie.textPrimary }]}>
               {latestVal} {tabInfo.unit}
             </Text>
-            {percentileText && (
-              <Text style={[styles.percentileText, { color: ollie.accent }]}>
-                {percentileText} percentile
-              </Text>
-            )}
           </View>
         )}
 
@@ -290,22 +276,6 @@ export default function MeasurementsScreen() {
               onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
             />
             <DateField value={date} onChange={setDate} maximumDate={new Date()} />
-            <View style={styles.formButtons}>
-              <Pressable
-                style={[styles.formBtn, { backgroundColor: ollie.bgSecondary }]}
-                onPress={resetForm}
-              >
-                <Text style={[styles.formBtnText, { color: ollie.textSecondary }]}>Cancel</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.formBtn, { backgroundColor: ollie.accent }]}
-                onPress={handleSave}
-              >
-                <Text style={[styles.formBtnText, { color: '#FFFFFF' }]}>
-                  {saving ? 'Saving...' : 'Save'}
-                </Text>
-              </Pressable>
-            </View>
           </View>
         ) : (
           <Pressable
@@ -316,6 +286,26 @@ export default function MeasurementsScreen() {
           </Pressable>
         )}
       </ScrollView>
+      {showForm && (
+        <View style={[styles.bottomBar, { backgroundColor: ollie.bg }]}>
+          <View style={styles.formButtons}>
+            <Pressable
+              style={[styles.formBtn, { backgroundColor: ollie.bgSecondary }]}
+              onPress={resetForm}
+            >
+              <Text style={[styles.formBtnText, { color: ollie.textSecondary }]}>Cancel</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.formBtn, { backgroundColor: ollie.accent }]}
+              onPress={() => { Keyboard.dismiss(); handleSave(); }}
+            >
+              <Text style={[styles.formBtnText, { color: '#FFFFFF' }]}>
+                {saving ? 'Saving...' : 'Save'}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -334,7 +324,6 @@ const styles = StyleSheet.create({
   tabText: { fontSize: 14, fontFamily: 'Nunito_700Bold' },
   currentCard: { padding: 20, alignItems: 'center', marginBottom: 16 },
   currentLabel: { fontSize: 13, marginBottom: 4 },
-  percentileText: { fontSize: 14, fontFamily: 'Nunito_700Bold', marginTop: 6 },
   currentValue: { fontSize: 32, fontFamily: 'Nunito_800ExtraBold' },
   chartCard: { padding: 16, marginBottom: 16 },
   chartTitle: { fontSize: 15, fontFamily: 'Nunito_700Bold', marginBottom: 12 },
@@ -351,7 +340,8 @@ const styles = StyleSheet.create({
   formCard: { padding: 16, gap: 10 },
   formTitle: { fontSize: 16, fontFamily: 'Nunito_700Bold', marginBottom: 4 },
   input: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, fontSize: 15, fontFamily: 'Nunito_400Regular' },
-  formButtons: { flexDirection: 'row', gap: 10, marginTop: 4 },
+  bottomBar: { paddingHorizontal: 20, paddingVertical: 12, paddingBottom: 20 },
+  formButtons: { flexDirection: 'row', gap: 10 },
   formBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
   formBtnText: { fontSize: 15, fontFamily: 'Nunito_700Bold' },
   addBtn: { paddingVertical: 16, alignItems: 'center' },

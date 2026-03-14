@@ -158,6 +158,8 @@ export default function OnboardingScreen() {
             <Text style={[styles.addMoreText, { color: ollie.accent }]}>+ Add Another Baby</Text>
           </Pressable>
 
+        </ScrollView>
+        <View style={styles.bottomBar}>
           <Pressable
             style={[styles.button, { backgroundColor: hasAtLeastOneValid ? ollie.accent : ollie.bgSecondary }]}
             onPress={handleSave}
@@ -177,7 +179,7 @@ export default function OnboardingScreen() {
               {loadingMock ? 'Generating data...' : 'Explore with Mock Data'}
             </Text>
           </Pressable>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -259,6 +261,10 @@ const styles = StyleSheet.create({
   addMoreText: {
     fontSize: 15,
     fontFamily: 'Nunito_700Bold',
+  },
+  bottomBar: {
+    paddingHorizontal: 24,
+    paddingBottom: 20,
   },
   button: {
     paddingVertical: 16,
