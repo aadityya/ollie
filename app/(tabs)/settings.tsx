@@ -26,10 +26,6 @@ export default function SettingsScreen() {
     setOnboardingCompleted,
     userName,
     setUserName,
-    customActivityTypes,
-    addCustomActivityType,
-    updateCustomActivityType,
-    removeCustomActivityType,
   } = useSettingsStore();
 
   const [editingName, setEditingName] = useState(false);
@@ -43,11 +39,6 @@ export default function SettingsScreen() {
   const [newBabyName, setNewBabyName] = useState('');
   const [newBabyDob, setNewBabyDob] = useState('');
   const [newBabyGender, setNewBabyGender] = useState<string>('girl');
-
-  // Custom activities
-  const [newActivity, setNewActivity] = useState('');
-  const [editingActivity, setEditingActivity] = useState<string | null>(null);
-  const [editActivityInput, setEditActivityInput] = useState('');
 
   const babies = useBabyStore((s) => s.babies);
   const activeBaby = useBabyStore((s) => s.activeBaby);
@@ -206,7 +197,7 @@ export default function SettingsScreen() {
                     ]}
                     onPress={() => updateBaby(activeBaby.id, { gender: key })}
                   >
-                    <Icon width={48} height={48} />
+                    <Icon width={72} height={72} />
                     <Text style={[styles.iconPickerLabel, { color: isSelected ? ollie.accent : ollie.textLight }]}>
                       {label}
                     </Text>
@@ -290,7 +281,7 @@ export default function SettingsScreen() {
                   ]}
                   onPress={() => setNewBabyGender(key)}
                 >
-                  <Icon width={36} height={36} />
+                  <Icon width={54} height={54} />
                   <Text style={[styles.genderLabel, { color: newBabyGender === key ? ollie.accent : ollie.textLight }]}>
                     {label}
                   </Text>
@@ -312,72 +303,6 @@ export default function SettingsScreen() {
           </View>
         )}
 
-        {/* Custom Activities */}
-        <Text style={[styles.groupTitle, { color: ollie.textLight }]}>CUSTOM ACTIVITIES</Text>
-        {customActivityTypes.map((type) => (
-          editingActivity === type ? (
-            <View key={type} style={[styles.nameEditRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm, marginBottom: 1 }]}>
-              <TextInput
-                style={[styles.nameInput, { color: ollie.textPrimary, borderColor: ollie.border, backgroundColor: ollie.bg }]}
-                value={editActivityInput}
-                onChangeText={setEditActivityInput}
-                autoFocus
-                onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
-              />
-              <Pressable
-                style={[styles.nameSaveBtn, { backgroundColor: ollie.accent }]}
-                onPress={() => {
-                  if (editActivityInput.trim()) {
-                    updateCustomActivityType(type, editActivityInput.trim());
-                  }
-                  setEditingActivity(null);
-                }}
-              >
-                <Text style={styles.nameSaveBtnText}>Save</Text>
-              </Pressable>
-            </View>
-          ) : (
-            <View
-              key={type}
-              style={[styles.activityRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}
-            >
-              <Text style={styles.activityEmoji}>🏷️</Text>
-              <Text style={[styles.activityLabel, { color: ollie.textPrimary }]}>{type}</Text>
-              <Pressable onPress={() => { setEditActivityInput(type); setEditingActivity(type); }}>
-                <Text style={[styles.activityAction, { color: ollie.accent }]}>Edit</Text>
-              </Pressable>
-              <Pressable onPress={() => {
-                Alert.alert('Delete Activity', `Delete "${type}"?`, [
-                  { text: 'Cancel', style: 'cancel' },
-                  { text: 'Delete', style: 'destructive', onPress: () => removeCustomActivityType(type) },
-                ]);
-              }}>
-                <Text style={[styles.activityAction, { color: ollie.textLight }]}>Delete</Text>
-              </Pressable>
-            </View>
-          )
-        ))}
-        <View style={[styles.addActivityRow, { backgroundColor: ollie.bgCard, borderRadius: ollie.radiusSm }]}>
-          <TextInput
-            style={[styles.addActivityInput, { color: ollie.textPrimary }]}
-            value={newActivity}
-            onChangeText={setNewActivity}
-            placeholder="New activity name..."
-            placeholderTextColor={ollie.textLight}
-            onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
-          />
-          <Pressable
-            onPress={() => {
-              if (newActivity.trim()) {
-                addCustomActivityType(newActivity.trim());
-                setNewActivity('');
-              }
-            }}
-          >
-            <Text style={[styles.addActivityBtn, { color: ollie.accent }]}>+ Add</Text>
-          </Pressable>
-        </View>
-
         {/* Appearance */}
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>APPEARANCE</Text>
         <View style={[styles.themeRow, { backgroundColor: ollie.bgCard, borderTopLeftRadius: ollie.radiusSm, borderTopRightRadius: ollie.radiusSm }]}>
@@ -390,19 +315,27 @@ export default function SettingsScreen() {
 
         {/* Data */}
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>DATA</Text>
-        <SettingsItem icon="📤" label="Export Data" isFirst />
-        <SettingsItem icon="☁️" label="Backup & Sync" />
         <SettingsItem
           icon="🗑️"
           label="Reset App"
           onPress={handleResetApp}
-          isLast
+          isOnly
         />
 
         {/* About */}
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>ABOUT</Text>
-        <SettingsItem icon="❓" label="Help & Support" isFirst />
-        <SettingsItem icon="📋" label="Privacy Policy" isLast />
+        <SettingsItem
+          icon="❓"
+          label="Help & Support"
+          onPress={() => router.push('/help-support')}
+          isFirst
+        />
+        <SettingsItem
+          icon="📋"
+          label="Privacy Policy"
+          onPress={() => router.push('/privacy-policy')}
+          isLast
+        />
 
         {/* App Info */}
         <View style={styles.appInfo}>
@@ -535,41 +468,5 @@ const styles = StyleSheet.create({
   genderLabel: {
     fontSize: 12,
     fontFamily: 'Nunito_600SemiBold',
-  },
-  activityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    gap: 14,
-    marginBottom: 1,
-  },
-  activityEmoji: { fontSize: 22 },
-  activityLabel: {
-    flex: 1,
-    fontSize: 15,
-    fontFamily: 'Nunito_600SemiBold',
-  },
-  activityAction: {
-    fontSize: 13,
-    fontFamily: 'Nunito_700Bold',
-    marginLeft: 6,
-  },
-  addActivityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    gap: 10,
-    marginTop: 2,
-  },
-  addActivityInput: {
-    flex: 1,
-    fontSize: 15,
-    fontFamily: 'Nunito_400Regular',
-  },
-  addActivityBtn: {
-    fontSize: 14,
-    fontFamily: 'Nunito_700Bold',
   },
 });

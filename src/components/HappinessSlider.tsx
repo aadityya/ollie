@@ -6,13 +6,13 @@ import * as happinessRepo from '@/src/db/repositories/happinessRepository';
 import { MoodIcons } from '@/src/constants/icons';
 
 const SCALE = [
-  { score: 2, label: 'Hard', iconIndex: 0 },
-  { score: 3, label: 'Okay', iconIndex: 1 },
-  { score: 5, label: 'Great', iconIndex: 2 },
+  { label: 'Hard', score: 2 },
+  { label: 'Okay', score: 3 },
+  { label: 'Great', score: 5 },
 ];
 
 interface HappinessSliderProps {
-  babyId: string | undefined;
+  babyId?: string;
   date: string;
   babyName?: string;
 }
@@ -23,46 +23,51 @@ export function HappinessSlider({ babyId, date, babyName }: HappinessSliderProps
 
   useEffect(() => {
     if (!babyId) return;
-    happinessRepo.getHappinessForDate(babyId, date).then((record) => {
-      if (record) setSelected(record.score);
-    }).catch(() => {});
+    happinessRepo.getHappinessForDate(babyId, date).then((rec) => {
+      if (rec) {
+        const idx = SCALE.findIndex((s) => s.score === rec.score);
+        setSelected(idx >= 0 ? idx : null);
+      } else {
+        setSelected(null);
+      }
+    });
   }, [babyId, date]);
 
-  const handleSelect = async (score: number) => {
+  const handleSelect = async (idx: number) => {
     if (!babyId) return;
-    setSelected(score);
-    try {
-      await happinessRepo.upsertHappiness({ babyId, date, score });
-    } catch (e) {
-      console.error('Happiness save error:', e);
-    }
+    setSelected(idx);
+    await happinessRepo.upsertHappiness({
+      babyId,
+      date,
+      score: SCALE[idx].score,
+    });
   };
 
   return (
     <View style={[styles.container, { backgroundColor: ollie.bgCard, borderRadius: ollie.radius }]}>
-      <Text style={[styles.title, { color: ollie.textPrimary }]}>Before you go to bed</Text>
-      {babyName && (
-        <Text style={[styles.subtitle, { color: ollie.textSecondary }]}>
-          How was {babyName}'s day?
-        </Text>
-      )}
+      <Text style={[styles.title, { color: ollie.textPrimary }]}>
+        Before you go to bed, how was {babyName ? `${babyName}'s` : 'the'} day today?
+      </Text>
       <View style={styles.row}>
-        {SCALE.map((item) => {
-          const isSelected = selected === item.score;
-          const MoodIcon = MoodIcons[item.iconIndex];
+        {SCALE.map((item, idx) => {
+          const isSelected = selected === idx;
+          const Icon = MoodIcons[idx];
           return (
             <Pressable
-              key={item.score}
+              key={item.label}
               style={[
                 styles.item,
                 isSelected && { backgroundColor: ollie.accentLight, borderRadius: ollie.radiusSm },
               ]}
-              onPress={() => handleSelect(item.score)}
+              onPress={() => handleSelect(idx)}
             >
-              <View style={[styles.moodIcon, !isSelected && styles.dimmed]}>
-                <MoodIcon width={72} height={72} />
-              </View>
-              <Text style={[styles.label, { color: isSelected ? ollie.accent : ollie.textLight }]}>
+              <Icon width={72} height={72} />
+              <Text
+                style={[
+                  styles.label,
+                  { color: isSelected ? ollie.accent : ollie.textLight },
+                ]}
+              >
                 {item.label}
               </Text>
             </Pressable>
@@ -76,17 +81,13 @@ export function HappinessSlider({ babyId, date, babyName }: HappinessSliderProps
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    marginBottom: 20,
+    marginTop: 16,
   },
   title: {
-    fontSize: 15,
+    fontSize: 16,
     fontFamily: 'Nunito_700Bold',
-    marginBottom: 2,
-  },
-  subtitle: {
-    fontSize: 13,
-    fontFamily: 'Nunito_600SemiBold',
-    marginBottom: 10,
+    marginBottom: 12,
+    textAlign: 'center',
   },
   row: {
     flexDirection: 'row',
@@ -94,14 +95,8 @@ const styles = StyleSheet.create({
   },
   item: {
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-  },
-  moodIcon: {
-    marginBottom: 4,
-  },
-  dimmed: {
-    opacity: 0.4,
+    padding: 10,
+    gap: 6,
   },
   label: {
     fontSize: 13,

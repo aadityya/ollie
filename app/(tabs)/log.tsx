@@ -1,15 +1,13 @@
 import React, { useCallback } from 'react';
 import { ScrollView, View, StyleSheet } from 'react-native';
-import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { ActivityCard } from '@/src/components/ActivityCard';
 import { useAppTheme } from '@/src/theme';
 import { useBabyStore } from '@/src/stores/useBabyStore';
-import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { useTodaySummary } from '@/src/hooks/useTodaySummary';
-import { activityMeta, getMetaForType } from '@/src/utils/activityHelpers';
+import { activityMeta } from '@/src/utils/activityHelpers';
 import { ActivityType } from '@/src/types';
 import { formatDuration } from '@/src/utils/dateHelpers';
 
@@ -18,7 +16,6 @@ export default function LogScreen() {
   const router = useRouter();
   const baby = useBabyStore((s) => s.activeBaby);
   const babyName = baby?.name ?? 'your baby';
-  const customActivityTypes = useSettingsStore((s) => s.customActivityTypes);
 
   const { summary, refresh } = useTodaySummary(baby?.id ?? null);
 
@@ -106,30 +103,6 @@ export default function LogScreen() {
           })}
         </View>
 
-        {/* Custom Activity Types */}
-        {customActivityTypes.length > 0 && (
-          <>
-            <Text style={[styles.sectionTitle, { color: ollie.textLight }]}>CUSTOM</Text>
-            <View style={styles.grid}>
-              {customActivityTypes.map((type) => {
-                const meta = getMetaForType(type);
-                const colors = meta.getColors(ollie);
-                return (
-                  <View key={type} style={styles.gridCell}>
-                    <ActivityCard
-                      icon={meta.icon}
-                      label={meta.label}
-                      subtitle={meta.subtitle}
-                      bgColor={colors.bg}
-                      textColor={colors.color}
-                      onPress={() => router.push(`/log/${type}`)}
-                    />
-                  </View>
-                );
-              })}
-            </View>
-          </>
-        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -155,12 +128,5 @@ const styles = StyleSheet.create({
   gridCell: {
     width: '47%',
     flexGrow: 1,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontFamily: 'Nunito_700Bold',
-    letterSpacing: 1,
-    marginBottom: 10,
-    marginTop: 6,
   },
 });

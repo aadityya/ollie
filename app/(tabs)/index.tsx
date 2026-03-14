@@ -14,7 +14,7 @@ import { useBabyStore } from '@/src/stores/useBabyStore';
 import { useSettingsStore } from '@/src/stores/useSettingsStore';
 import { useTodaySummary } from '@/src/hooks/useTodaySummary';
 import { formatTimeAgo, todayDateStr } from '@/src/utils/dateHelpers';
-import { activityMeta, getMetaForType } from '@/src/utils/activityHelpers';
+import { activityMeta } from '@/src/utils/activityHelpers';
 import { formatDuration } from '@/src/utils/dateHelpers';
 import { getDailyPhrase } from '@/src/constants/motivationalPhrases';
 import { ActivityType } from '@/src/types';
@@ -25,7 +25,6 @@ export default function HomeScreen() {
   const router = useRouter();
   const baby = useBabyStore((s) => s.activeBaby);
   const userName = useSettingsStore((s) => s.userName);
-  const customActivityTypes = useSettingsStore((s) => s.customActivityTypes);
 
   const { summary, refresh } = useTodaySummary(baby?.id ?? null);
 
@@ -172,31 +171,6 @@ export default function HomeScreen() {
           })}
         </View>
 
-        {/* Custom Activity Types */}
-        {customActivityTypes.length > 0 && (
-          <>
-            <Text style={[styles.customTitle, { color: ollie.textLight }]}>CUSTOM</Text>
-            <View style={styles.grid}>
-              {customActivityTypes.map((type) => {
-                const meta = getMetaForType(type);
-                const colors = meta.getColors(ollie);
-                return (
-                  <View key={type} style={styles.gridCell}>
-                    <ActivityCard
-                      icon={meta.icon}
-                      label={meta.label}
-                      subtitle={meta.subtitle}
-                      bgColor={colors.bg}
-                      textColor={colors.color}
-                      onPress={() => router.push(`/log/${type}`)}
-                    />
-                  </View>
-                );
-              })}
-            </View>
-          </>
-        )}
-
         {/* Before you go to bed */}
         <HappinessSlider babyId={baby?.id} date={todayDateStr()} babyName={baby?.name} />
 
@@ -262,13 +236,6 @@ const styles = StyleSheet.create({
   gridCell: {
     width: '47%',
     flexGrow: 1,
-  },
-  customTitle: {
-    fontSize: 12,
-    fontFamily: 'Nunito_700Bold',
-    letterSpacing: 1,
-    marginBottom: 10,
-    marginTop: 6,
   },
   timeAgo: {
     fontSize: 12,

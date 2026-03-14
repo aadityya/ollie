@@ -2,6 +2,8 @@ import * as babyRepo from '@/src/db/repositories/babyRepository';
 import * as activityRepo from '@/src/db/repositories/activityRepository';
 import * as growthRepo from '@/src/db/repositories/growthRepository';
 import * as happinessRepo from '@/src/db/repositories/happinessRepository';
+import * as appointmentRepo from '@/src/db/repositories/appointmentRepository';
+import * as memoryRepo from '@/src/db/repositories/memoryRepository';
 import { FeedType, PeeAmount, PoopColor, PoopConsistency, SleepType, ColicIntensity } from '@/src/types';
 
 function rand(min: number, max: number): number {
@@ -141,6 +143,7 @@ async function generateActivitiesForDay(babyId: string, date: Date) {
       durationSeconds,
     });
   }
+
 }
 
 async function generateGrowthRecords(
@@ -227,6 +230,70 @@ export async function generateMockData(): Promise<string> {
   // Happiness records for 30 days
   await generateHappinessRecords(jane.id, 30);
   await generateHappinessRecords(jack.id, 30);
+
+  // Appointments
+  const futureDate = (daysFromNow: number) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() + daysFromNow);
+    d.setHours(rand(9, 16), rand(0, 3) * 15, 0, 0);
+    return d.toISOString();
+  };
+  await appointmentRepo.insertAppointment({
+    babyId: jane.id,
+    title: '6-Month Checkup',
+    dateTime: futureDate(5),
+    location: 'Dr. Patel Pediatrics',
+    notes: 'Bring vaccination booklet',
+  });
+  await appointmentRepo.insertAppointment({
+    babyId: jane.id,
+    title: 'Vaccination - DTaP',
+    dateTime: futureDate(12),
+    location: 'City Health Clinic',
+  });
+  await appointmentRepo.insertAppointment({
+    babyId: jack.id,
+    title: '3-Month Wellness Visit',
+    dateTime: futureDate(3),
+    location: 'Sunshine Pediatrics',
+    notes: 'Ask about sleep schedule',
+  });
+
+  // Memories
+  const pastDate = (daysAgo: number) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - daysAgo);
+    return d.toISOString().split('T')[0];
+  };
+  await memoryRepo.insertMemory({
+    babyId: jane.id,
+    title: 'First smile!',
+    date: pastDate(60),
+    description: 'Jane gave us her very first real smile today during tummy time. It was the most magical moment!',
+  });
+  await memoryRepo.insertMemory({
+    babyId: jane.id,
+    title: 'Rolled over for the first time',
+    date: pastDate(30),
+    description: 'She rolled from tummy to back all by herself!',
+  });
+  await memoryRepo.insertMemory({
+    babyId: jane.id,
+    title: 'Giggled at peek-a-boo',
+    date: pastDate(10),
+  });
+  await memoryRepo.insertMemory({
+    babyId: jack.id,
+    title: 'First bath at home',
+    date: pastDate(75),
+    description: 'Jack was so calm during his first bath. Loved the warm water!',
+  });
+  await memoryRepo.insertMemory({
+    babyId: jack.id,
+    title: 'Discovered his hands',
+    date: pastDate(20),
+    description: 'Spent 10 minutes staring at his own fingers!',
+  });
 
   // Set Jane as active
   await babyRepo.setActiveBaby(jane.id);

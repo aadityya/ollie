@@ -58,9 +58,9 @@ export function getMetaForType(type: string): ActivityMeta {
     return activityMeta[type as ActivityType];
   }
   return {
-    icon: AppIcons.log,
+    icon: AppIcons.feed,
     label: type,
-    subtitle: 'Custom',
+    subtitle: '',
     getColors: (p) => ({ bg: p.bgSecondary, color: p.textPrimary }),
   };
 }

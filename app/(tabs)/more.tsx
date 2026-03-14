@@ -31,22 +31,20 @@ export default function MoreScreen() {
           label="Measurements"
           onPress={() => router.push('/measurements')}
           isFirst
+          iconScale={1.5}
         />
         <SettingsItem
           icon={AppIcons.appointments}
           label="Appointments"
           onPress={() => router.push('/appointments')}
+          iconScale={1.5}
         />
         <SettingsItem
           icon={AppIcons.memories}
           label="Memories"
           onPress={() => router.push('/memories')}
-        />
-        <SettingsItem
-          icon={AppIcons.medications}
-          label="Medications"
-          onPress={() => router.push('/medications')}
           isLast
+          iconScale={1.5}
         />
 
         <Text style={[styles.groupTitle, { color: ollie.textLight }]}>APP</Text>
@@ -55,6 +53,7 @@ export default function MoreScreen() {
           label="Settings"
           onPress={() => router.push('/(tabs)/settings')}
           isOnly
+          iconScale={1.5}
         />
       </ScrollView>
     </SafeAreaView>
@@ -64,7 +63,7 @@ export default function MoreScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   container: { flex: 1 },
-  content: { padding: 20, paddingTop: 16 },
+  content: { padding: 14, paddingTop: 12 },
   badgeWrap: { marginTop: 4, marginBottom: 16 },
   groupTitle: {
     fontSize: 12,

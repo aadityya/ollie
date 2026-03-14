@@ -31,7 +31,6 @@ const titles: Record<string, string> = {
   colic: 'Log Colic Episode',
   tummy_time: 'Log Tummy Time',
   sun_time: 'Log Sun Time',
-  medication: 'Log Medication',
 };
 
 const timerTypes = ['feed', 'sleep', 'colic', 'tummy_time', 'sun_time'];
@@ -314,7 +313,7 @@ export default function ActivityFormScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: ollie.textSecondary }]}>{'< Back'}</Text>
+          <Text style={[styles.backText, { color: ollie.textSecondary }]}>{'Back'}</Text>
         </Pressable>
 
         <View style={[styles.header, { backgroundColor: colors.bg }]}>

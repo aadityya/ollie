@@ -22,7 +22,6 @@ import MoreIcon from '../../assets/icons/more-options.svg';
 // Settings & More page icons
 import SettingsIcon from '../../assets/icons/settings.svg';
 import MilestonesIcon from '../../assets/icons/milestones.svg';
-import MedicationsIcon from '../../assets/icons/medications.svg';
 import MeasurementsIcon from '../../assets/icons/measurements.svg';
 import MemoriesIcon from '../../assets/icons/memories.svg';
 import AppointmentsIcon from '../../assets/icons/appointments.svg';
@@ -33,10 +32,8 @@ import BoyIcon from '../../assets/icons/boy.svg';
 import GirlIcon from '../../assets/icons/girl.svg';
 
 // Mood icons (for HappinessSlider)
-import MoodDistressedIcon from '../../assets/icons/mood-distressed.svg';
 import MoodFussyIcon from '../../assets/icons/mood-fussy.svg';
 import MoodCalmIcon from '../../assets/icons/mood-calm.svg';
-import MoodContentIcon from '../../assets/icons/mood-content.svg';
 import MoodHappyIcon from '../../assets/icons/mood-happy.svg';
 
 export const AppIcons: Record<string, IconComponent> = {
@@ -57,7 +54,6 @@ export const AppIcons: Record<string, IconComponent> = {
   // Settings & More
   settings: SettingsIcon,
   milestones: MilestonesIcon,
-  medications: MedicationsIcon,
   measurements: MeasurementsIcon,
   memories: MemoriesIcon,
   appointments: AppointmentsIcon,

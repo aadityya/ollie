@@ -163,18 +163,19 @@ export default function InsightsScreen() {
         {/* Happiness Chart */}
         <View style={[styles.chartCard, { backgroundColor: ollie.bgCard, borderRadius: ollie.radius }]}>
           <Text style={[styles.chartTitle, { color: ollie.textPrimary }]}>Happiness</Text>
-          <View style={styles.happinessLegend}>
-            <Text style={[styles.legendLabel, { color: ollie.textLight }]}>Hard</Text>
-            <Text style={[styles.legendLabel, { color: ollie.textLight }]}>Okay</Text>
-            <Text style={[styles.legendLabel, { color: ollie.textLight }]}>Great</Text>
-          </View>
-          {happinessData.length > 0 && (
+{happinessData.length > 0 && (
             <BarChart
               data={happinessData}
               {...chartProps}
               noOfSections={3}
               maxValue={5}
               stepValue={2}
+              formatYLabel={(val: string) => {
+                const n = Number(val);
+                if (n <= 2) return 'Hard';
+                if (n <= 3) return 'Okay';
+                return 'Great';
+              }}
             />
           )}
         </View>
