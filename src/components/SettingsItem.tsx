@@ -14,6 +14,7 @@ interface SettingsItemProps {
   isFirst?: boolean;
   isLast?: boolean;
   isOnly?: boolean;
+  iconScale?: number;
 }
 
 export function SettingsItem({
@@ -26,6 +27,7 @@ export function SettingsItem({
   isFirst,
   isLast,
   isOnly,
+  iconScale = 1,
 }: SettingsItemProps) {
   const { ollie } = useAppTheme();
 
@@ -37,14 +39,18 @@ export function SettingsItem({
         ? { borderBottomLeftRadius: ollie.radiusSm, borderBottomRightRadius: ollie.radiusSm }
         : {};
 
+  const emojiSize = 22 * iconScale;
+  const svgSize = 36 * iconScale;
+  const iconBoxSize = svgSize;
+
   const renderIcon = () => {
     if (typeof icon === 'string') {
-      return <Text style={styles.iconEmoji}>{icon}</Text>;
+      return <Text style={[styles.iconEmoji, { fontSize: emojiSize }]}>{icon}</Text>;
     }
     const Icon = icon;
     return (
-      <View style={styles.iconContainer}>
-        <Icon width={36} height={36} />
+      <View style={[styles.iconContainer, { width: iconBoxSize, height: iconBoxSize }]}>
+        <Icon width={svgSize} height={svgSize} />
       </View>
     );
   };
@@ -56,6 +62,7 @@ export function SettingsItem({
         styles.container,
         { backgroundColor: ollie.bgCard },
         borderRadiusStyle,
+        iconScale > 1 && { paddingVertical: 4, paddingHorizontal: 8, gap: 8 },
       ]}
     >
       {renderIcon()}

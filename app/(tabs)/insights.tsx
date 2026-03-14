@@ -56,6 +56,14 @@ export default function InsightsScreen() {
     showGradient: true,
   }));
 
+  const colicData = data.map((d) => ({
+    value: d.colicCount,
+    label: d.label,
+    frontColor: ollie.colic.color,
+    gradientColor: ollie.colic.bg,
+    showGradient: true,
+  }));
+
   const happinessData = data.map((d) => ({
     value: d.happinessScore ?? 0,
     label: d.label,
@@ -67,6 +75,7 @@ export default function InsightsScreen() {
   const maxFeed = Math.max(...feedData.map((d) => d.value), 1);
   const maxDiaper = Math.max(...diaperData.map((d) => d.value), 1);
   const maxSleep = Math.max(...sleepData.map((d) => d.value), 1);
+  const maxColic = Math.max(...colicData.map((d) => d.value), 1);
 
   const chartProps = {
     barWidth,
@@ -156,6 +165,19 @@ export default function InsightsScreen() {
               {...chartProps}
               noOfSections={Math.min(Math.ceil(maxSleep), 4)}
               maxValue={Math.ceil(maxSleep * 1.2) || 1}
+            />
+          )}
+        </View>
+
+        {/* Colic Chart */}
+        <View style={[styles.chartCard, { backgroundColor: ollie.bgCard, borderRadius: ollie.radius }]}>
+          <Text style={[styles.chartTitle, { color: ollie.textPrimary }]}>Colic</Text>
+          {colicData.length > 0 && (
+            <BarChart
+              data={colicData}
+              {...chartProps}
+              noOfSections={Math.min(maxColic, 4)}
+              maxValue={Math.ceil(maxColic * 1.2) || 1}
             />
           )}
         </View>

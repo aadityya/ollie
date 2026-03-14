@@ -137,7 +137,7 @@ export default function MedicationsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: ollie.textSecondary }]}>{'< Back'}</Text>
+          <Text style={[styles.backText, { color: ollie.textSecondary }]}>{'Back'}</Text>
         </Pressable>
 
         <Text style={[styles.title, { color: ollie.textPrimary }]}>

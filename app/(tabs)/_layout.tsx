@@ -13,7 +13,7 @@ interface TabIconProps {
 function TabIcon({ icon: Icon, focused, activeBg }: TabIconProps) {
   return (
     <View style={[styles.tabIcon, focused && { backgroundColor: activeBg }]}>
-      <Icon width={64} height={64} />
+      <Icon width={48} height={48} />
     </View>
   );
 }
@@ -96,8 +96,8 @@ const styles = StyleSheet.create({
   tabIcon: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: 14,
     overflow: 'hidden',
   },
